@@ -1,0 +1,69 @@
+@import '../global';
+
+$panel_border_radius: .2em;
+
+@mixin sencha-panel {
+  .x-panel,
+  .x-panel-body {
+    position: relative;
+  }
+
+  .x-panel.x-floating {
+    padding: 6px;
+    -webkit-border-radius: 8px;
+    -webkit-box-shadow: rgba(0,0,0,.8) 0 2px 10px;
+    @include bg_gradient(darken($base_color, 40%), 'glossy');
+  
+    &.x-panel-light {
+      @include bg_gradient($base_color, 'glossy');    
+    }
+  }
+
+  .x-panel.x-floating > .x-panel-body {
+    background-color: #fff;
+    @include border_radius($panel_border_radius);
+  }
+
+  $anchor_size: .7em;
+  $anchor_width: $anchor_size*2.33;
+  $anchor_height: $anchor_size;
+
+  .x-anchor {
+    width: $anchor_size;
+    height: $anchor_size;
+    position: absolute;
+    z-index: 1;
+    -webkit-transform-origin: center center;
+    
+    &:before, &:after {
+      @include insertion($anchor_width, $anchor_height, 0, 0);
+      -webkit-mask: 0 0 theme_image($theme_name, "tip_horizontal.png") no-repeat;
+      -webkit-mask-size: $anchor_width $anchor_height;
+      overflow: hidden;
+      @include bg_gradient($base_color);
+    }
+
+    &.x-anchor-bottom {
+      -webkit-transform: rotate(180deg);
+
+      &:before, &:after {
+        @include bg_gradient(darken($base_color, 30%));
+      }
+    }
+    
+    &.x-anchor-left,
+    &.x-anchor-right {
+      &:before, &:after {
+        @include bg_gradient(darken($base_color, 20%));
+      }
+    }
+    
+    &.x-anchor-left {
+        -webkit-transform: rotate(270deg);
+    }
+    
+    &.x-anchor-right {
+        -webkit-transform: rotate(90deg);
+    }
+  }
+}

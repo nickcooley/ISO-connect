@@ -1,0 +1,95 @@
+@import '../global';
+
+$list_color: #000 !default;
+$list_bg_color: #f7f7f7 !default;
+
+$list_highlights: $include_highlights !default;
+
+$list_pressed_color: lighten($bright_color, 50%) !default;
+$list_opacity: true !default;
+
+$list_header_color: darken(desaturate($base_color, 10%), 25%) !default;
+$list_header_bg_color: lighten(saturate($base_color, 10%), 5%) !default;
+$list_header_bg_gradient: $default_gradient !default;
+
+@mixin sencha-list {
+  .x-list {
+    background-color: $list_bg_color;
+
+    .x-disclosure {
+      top: 15%;
+      position: absolute;
+      right: 1em;
+      overflow: visible;
+    }
+    
+    &.x-list-indexed .x-disclosure {
+      right: 2em;
+    }
+
+    .x-item-selected .x-disclosure {
+      background: #fff none;
+    }
+    
+    .x-list-group-items > *, 
+    &.x-list-flat .x-list-parent > * {
+      position: relative;
+      color: $list_color;
+      padding: 0.6em 0.8em;
+      height: 2.5em;
+      border-bottom: 1px solid darken($list_bg_color, 10%);
+      
+      @if $list_highlights {
+        border-top: 1px solid lighten($list_bg_color, 30%);
+      }
+      
+      span {
+        font-size: .9em;
+      }
+
+      &.x-item-pressed {
+        
+        border-top-color: lighten($bright_color, 50%);
+        background: $list_pressed_color none; 
+      }
+      
+      &.x-item-selected {
+        
+        -webkit-transform: translate(0, 0);
+         @include bg_gradient($active_color);
+        color: #fff;
+        
+        @if $list_highlights {
+          
+          border-top-color: darken($active_color, 10%);
+          border-bottom-color: darken($active_color, 20%);
+        }
+        
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+  
+  .x-list-header {   
+    @include bg_gradient($list_header_bg_color, $list_header_bg_gradient);
+    border-top: 1px solid $list_header_bg_color;  
+    border-bottom: 1px solid darken($list_header_bg_color, 20%);  
+    font-weight: bold;
+    font-size: 0.8em;
+    color: $list_header_color;
+    padding: 0.2em 1.02em;
+    @if $list_highlights {
+      -webkit-box-shadow: 0px .1em .3em rgba(0, 0, 0, 0.3);
+      @include bevel_text('light');
+    }
+  }
+  
+  .x-list-header-swap {
+    z-index: 1;
+    position: absolute;
+    -webkit-transform: translate(0, 0);
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}

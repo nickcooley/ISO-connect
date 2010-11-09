@@ -1,0 +1,110 @@
+// Tab icons used with permission from Drew Wilson
+// http://pictos.drewwilson.com/
+// Pictos icons are (c) 2010 Drew Wilson
+
+@import '../global';
+@import 'tabs-bottom';
+
+@mixin tabbar_mask_icon($name) {
+  .x-tab img.#{$name} {
+    -webkit-mask-box-image: theme_image($theme_name, "tabicons/" + $name + ".png");
+  }
+}
+
+$top_tab_height: $global_row_height - .8em;
+
+@mixin sencha-top-tabs {
+  
+  .x-tabbar.x-docked-top {
+    
+    border-bottom: .1em solid;
+    height: $global_row_height;
+    padding: 0 .8em;
+    
+    .x-tab {
+      margin: .4em .2em;
+      padding: (($top_tab_height - 1em) / 2) .8em;
+      height: $top_tab_height;
+      @include border-radius($top_tab_height / 2);
+    }
+    .x-tab-active {
+      -webkit-box-shadow: rgba(#fff, .2) 0 .1em .1em, inset rgba(#000, .3) 0 .1em .2em;
+    }
+    .x-button-label {
+      font-size: .8em;
+      line-height: 1.2em;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+  }
+}
+
+@mixin sencha-tabs {
+  @include sencha-top-tabs;
+  @include sencha-bottom-tabs;
+  
+  $light_tab_color: lighten(desaturate($base_color, 10%), 5%);
+  $light_tab_active: darken(saturate($active_color, 20%), 10%);
+  $dark_tab_color: darken($base_color, 30%);
+  $dark_tab_active: saturate(lighten($active_color, 15%), 60%);
+  
+  @include sencha-tabbar-ui('light', $light_tab_color, 'matte', $light_tab_active);
+  @include sencha-tabbar-ui('dark', $dark_tab_color, 'matte', $dark_tab_active);
+  
+  .x-tab.x-item-disabled span.x-button-label, .x-tab.x-item-disabled img {
+    opacity: .5;
+  }
+  .x-tab.x-draggable {
+    opacity: .7;
+  }
+}
+
+@mixin sencha-tabbar-ui($ui_label, $bar_color, $bar_gradient, $tab_active_color) {
+  .x-tabbar-#{$ui_label} {
+    @include bg_gradient($bar_color, $bar_gradient);
+    border-color: darken($bar_color, 5%);
+    
+    .x-tab {
+      @include color_by_background($bar_color, 40%);
+    }
+    
+    .x-tab-active {
+      @include color_by_background(lighten($bar_color, 10%), 50%);
+    }
+    
+    .x-tab-pressed {
+      @include color_by_background(lighten($bar_color, 10%), 45%);
+      background-color: rgba(#000, .2);
+    }
+  }
+  
+  .x-tabbar-#{$ui_label}.x-docked-bottom {
+
+    .x-tab {
+      @include bevel_by_background($bar_color);
+
+      img {
+        @include mask_by_background($bar_color, 30%, $bottom_tab_gradient);
+      }
+    }
+    
+    .x-tab-active {
+      @include bg_gradient(lighten($bar_color, 10%), $bottom_tab_active_gradient);
+      @include bevel_by_background(lighten($bar_color, 10%));
+
+      img {
+        @include bg_gradient($tab_active_color, $bottom_tab_active_gradient);
+      }
+    }
+  }
+  
+  .x-tabbar-#{$ui_label}.x-docked-top {
+    .x-tab-active {
+      @include bg_gradient(lighten($bar_color, 10%), 'recessed');
+    }
+    
+    .x-tab-active {
+      @include color_by_background(lighten($bar_color, 10%), 90%);
+    }
+  }
+}

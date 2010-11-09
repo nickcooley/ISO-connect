@@ -1,0 +1,25 @@
+$theme_name: 'default';
+
+$include_html_style: true !default;
+$include_all_icons: true !default;
+$include_form_sliders: true !default;
+
+// These are the only variables which drive the theme color scheme
+$base_color: #484948 !default;
+$alert_color: red !default;
+$bright_color: #f16628 !default;
+
+// These are created automatically from the above,
+// but can also be set to explicit values
+$active_color: darken(saturate($bright_color, 55%), 5%) !default;
+$complement: complement($bright_color) !default;
+$complement_light: lighten($complement, 40%) !default;
+
+$default_gradient: 'matte' !default;
+$button_gradient: 'matte' !default;
+$include_highlights: true;
+
+$input_radius: .2em !default;
+$txtareaheight: 6em !default;
+
+$spacing: .3em;

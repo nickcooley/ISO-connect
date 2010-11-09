@@ -1,0 +1,53 @@
+
+$bottom_tab_radius: .2em !default;
+$bottom_tab_icon_size: 1.65em !default;
+
+$bottom_tab_active_gradient: 'matte';
+$bottom_tab_gradient: 'bevel';
+
+@mixin sencha-bottom-tabs {
+  .x-tabbar.x-docked-bottom {
+    
+    border-top: .1em solid;
+    height: 3em;
+    
+    .x-tab {
+      @include display-box;
+      @include box-direction(reverse);
+      @include box-orient(vertical);
+      @include border-radius($bottom_tab_radius);
+      margin: .1em .15em;
+      min-width: 3.3em;
+      position: relative;
+
+      img {
+        width: $bottom_tab_icon_size;
+        height: $bottom_tab_icon_size;
+        display: block;
+        margin: .4em auto .1em;
+      }
+
+      .x-button-label {
+        margin: 0;
+        font-size: 9px;
+        line-height: 12px;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+    }
+  }
+  
+  @if $include_all_icons {
+    @include tabbar_mask_icon('bookmarks');
+    @include tabbar_mask_icon('download');
+    @include tabbar_mask_icon('favorites');
+    @include tabbar_mask_icon('info');
+    @include tabbar_mask_icon('more');
+    @include tabbar_mask_icon('search');
+    @include tabbar_mask_icon('time');
+    @include tabbar_mask_icon('user');
+    @include tabbar_mask_icon('team');
+    @include tabbar_mask_icon('settings');
+  }
+  
+}

@@ -1,0 +1,500 @@
+3.0.21 (Classy Cassidy)
+06753d886b2143ca7450f4c6b4ef0d2307aa940b
+o:Sass::Tree::RootNode
+:@template"ð@import '../global';
+@import 'form-sliders';
+
+$form_bg_color: #eee;
+$form_light: #ddd;
+$form_dark: #333;
+
+$form_input_fields: '.x-input-text, .x-input, .x-input-number, .x-spinner-body, .x-input-radio, .x-input-checkbox, .x-input-email, .x-input-url, .x-input-password, .x-input-slider';
+$form_masked_fields: '.x-input-radio, .x-input-checkbox';
+$form_scrollable_fields: '.x-field-slider, .x-field-toggle, .x-field-checkbox, .x-field-radio';
+
+$form_label_width: 6em !default;
+$form_field_height: 2.5em !default;
+
+$form_spacing: .6em;
+
+$thumbsize: 2.2em !default;
+$togglesize: $thumbsize - .35em;
+$checkheight: $thumbsize - 1em;
+$thumbspace: ( $thumbsize - $togglesize ) / 2;
+
+$form_fieldset_radius: .4em !default;
+
+@mixin label {
+  text-shadow: #fff 0 1px 1px;
+  color: $form_dark; 
+}
+
+@mixin sencha-form($include_sliders: $include_form_sliders) {
+  
+  .x-form .x-panel-body {
+    padding: 1em;
+    background-color: $form_bg_color;
+  }
+  
+  .x-input-el {
+    min-height: $form_field_height;
+    width: 100%;
+    display: block;
+    background: #fff none;
+    -webkit-appearance: none;
+  }
+  
+  .x-field {
+    overflow: hidden;
+    position: relative;
+    min-height: $form_field_height;
+    border-bottom: 1px solid $form_light;
+    
+    input, textarea, select, .x-field-slider {
+      @extend .x-input-el;
+      @include border-radius(0);
+      padding: .4em;
+      border: 0;
+    }
+  }
+  
+  .x-field:last-child {
+    border-bottom: 0;
+  }
+  
+  .x-field-mask {
+    @include stretch;
+  }
+  
+  #{$form_scrollable_fields} {
+    .x-field-mask {
+      @extend .x-hidden-display;
+    }
+  }
+
+  // Hidden fields
+
+  .x-field-hidden {
+    @extend .x-hidden-display;
+  }
+
+  .x-form-fieldset {
+    
+    margin: 1em 0 1.5em;
+    
+    .x-panel-body {
+      border: 1px solid $form_light;
+      padding: 0;
+      @if $include_highlights {
+        -webkit-box-shadow: rgba(255,255,255,.7) 0 1px 0;
+      }
+      @include border-radius($form_fieldset_radius);
+      overflow: hidden;
+    }
+  }
+  
+  .x-form-fieldset-title {
+    @include label;
+    margin: 1em ( $form_spacing + .1em ) .3em;
+    color: $form_dark;
+    font-weight: bold;
+  }
+  
+  .x-form-fieldset-instructions {
+    @include label;
+    color: lighten($form_dark, 30%);
+    margin: 1em ( $form_spacing + .1em ) .3em;
+    font-size: .8em;
+    text-align: center;
+  }
+  
+  .x-form-label {
+    @include label;
+    @include bevel_text('light');
+    background-color: lighten($form_light, 10%);
+    padding: $form_spacing;
+    border-top: 1px solid lighten($form_light, 20%);
+    display: block;
+
+    span {
+      font-size: .8em;
+      font-weight: bold;
+    }
+  }
+  
+  .x-field {
+    @include display-box;
+  }
+  
+  .x-label-align-left, .x-label-align-right {
+    @include box-orient(horizontal);
+    @include box-align(stretch);
+    
+    label {
+      width: $form_label_width;
+    }
+    
+    #{$form_input_fields} {
+      @include box-flex(1);
+    }
+  }
+  
+  // Round the corners on fieldsets.
+  // Warning: It ain't pretty
+  
+  $form_rounded_elements: #{$form_input_fields};
+  
+  .x-field:first-child {
+    #{$form_rounded_elements}, &.x-field-toggle, &.x-field-slider {
+      @include border-top-radius($form_fieldset_radius);
+    }
+  }
+  .x-field:last-child {
+    #{$form_rounded_elements}, &.x-field-toggle, &.x-field-slider {
+      @include border-bottom-radius($form_fieldset_radius);
+    }
+  }
+  .x-label-align-left {
+    &:first-child {
+      .x-form-label {
+        @include border-top-left-radius($form_fieldset_radius);
+      }
+      #{$form_rounded_elements}, &.x-field-toggle, &.x-field-slider {
+        @include border-top-left-radius(0);
+      }
+    }
+    &:last-child {
+      .x-form-label {
+        @include border-bottom-left-radius($form_fieldset_radius);
+      }
+      #{$form_rounded_elements}, &.x-field-toggle, &.x-field-slider {
+        @include border-bottom-left-radius(0);
+      }
+    }
+  }
+  .x-label-align-right {
+    @include box-direction(reverse);
+    @include box-pack(end);
+    &:first-child {
+      .x-form-label {
+        @include border-top-right-radius($form_fieldset_radius);
+      }
+      #{$form_rounded_elements} {
+        @include border-top-right-radius(0);
+      }
+    }
+    &:last-child {
+      .x-form-label {
+        @include border-bottom-right-radius($form_fieldset_radius);
+      }
+      #{$form_rounded_elements} {
+        @include border-bottom-right-radius(0);
+      }
+    }
+  }
+  
+  .x-label-align-top, .x-label-align-bottom {
+    @include box-orient(vertical);
+  }
+  .x-label-align-bottom {
+    @include box-direction(reverse);
+  }
+  
+  // Required fields
+  
+  .x-field-required {
+    label:after {
+      content: "*";
+      display: inline;
+    }
+    label {
+      // color: $base_color;
+    }
+  }
+
+  // Create the dropdown arrow
+  // for select fields
+  .x-field-select {
+    
+    // Tip
+    &:after {
+      @include insertion(0,0,0,auto);
+      right: 0;
+      position: absolute;
+      display: block;
+      margin: 1em;
+      border: .4em solid transparent;
+      border-top-color: $form_light;
+      z-index: 1;
+    }
+
+    &.x-label-align-right:after {
+      right: $form_label_width;
+    }
+
+    &.x-label-align-top:after {
+      top: auto;
+      bottom: 0;
+    }
+  }
+  
+  .x-item-disabled {
+    label span, input, .x-spinner-body, select, textarea {
+      opacity: .5;
+    }
+  }
+  
+  .x-field-textarea {
+    textarea {
+      min-height: $txtareaheight;
+      padding-top: .5em;
+    }
+  }
+  
+  .x-field .x-input-radio, .x-field .x-input-checkbox {
+    &:after {
+      @include insertion(1.3em, 1.3em, .8em, auto);
+      right: $form_spacing;
+      -webkit-mask: theme-image($theme_name, 'check.png') no-repeat;
+      -webkit-mask-size: 1.3em auto;
+      @include bg_gradient($form_light, 'flat');
+    }
+    
+    &:checked:after {
+      @include bg_gradient($active_color, 'flat');
+    }
+  }
+  
+  .x-label-align-right .x-input-radio:after, .x-label-align-right .x-input-checkbox:after {
+    right: auto;
+    left: $form_spacing;
+  }
+
+  // Spinner
+  .x-spinner {
+    border-bottom: 1px solid $form_light;
+  }
+  
+  .x-spinner .x-spinner-body {
+    @include display-box;
+    @include box-direction(normal);
+  }
+  
+  .x-spinner-body {
+    @include box-orient(horizontal);
+    @include box-align(stretch);
+    text-align: center;
+    
+    span {
+      font-size: 1.3em;
+      font-weight: bold;
+      @include bevel_text('light');
+    }
+    
+    input {
+      width: 3em;
+      padding: 0;
+      border-right: 0;
+      border-left: 0;
+      @include border-radius(0);
+      border-color: $form_light;
+      text-align: center;
+    }
+
+    .x-spinner-down, .x-spinner-up {
+      @include box-flex(1);
+      font-weight: bold;
+      padding: .3em 0;
+      @include toolbar_button($form_light);
+    }
+    .x-spinner-down {
+      border-left: 0;
+    }
+    .x-spinner-up {
+      border-right: 0;
+    }
+  }
+
+  $form_clear_size: 1.1em;
+
+  .x-field-clear {
+    width: $form_clear_size;
+    height: $form_clear_size;
+    @include border-radius($form_clear_size/2);
+    background-color: rgba(#000, .15);
+    color: #fff;
+    position: absolute;
+    font-weight: bold;
+    line-height: .9em;
+    text-align: center;
+  }
+  
+  .x-field-clearable input.x-field-clearable {
+    padding-right: $form_clear_size + $form_spacing;
+  }
+
+  .x-label-align-left, .x-label-align-top, .x-label-align-bottom {
+    .x-field-clear {
+      right: .4em;
+      top: .7em;
+    }
+  }
+  .x-label-align-top .x-field-clear {
+    top: auto;
+    bottom: .7em;
+  }
+  
+  .x-label-align-right .x-field-clear {
+    top: $form_spacing;
+    right: $form_spacing + $form_label_width;
+  }
+
+  @if $include_sliders {
+    @include sencha-form-sliders;
+  }
+  
+  .x-select-overlay {
+    min-width: 200px;
+  }
+}:@options{:line_commentsT:cache_location"J/Users/ncooley/Desktop/projects/forresterProd/lib_fe/sass/.sass-cache:syntax:	scss:property_syntax0:
+style:expanded:
+cacheT:filename"~/Users/ncooley/Desktop/projects/forresterProd/lib_fe/sass/../themes/stylesheets/sencha-touch/default/./widgets/_form.scss:css_filename"development/ext-touch.css:load_paths[">/Users/ncooley/Desktop/projects/forresterProd/lib_fe/sass"P/Library/Ruby/Gems/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets"d/Library/Ruby/Gems/1.8/gems/compass-0.10.5/frameworks/_blueprint_deprecated_imports/stylesheets"N/Library/Ruby/Gems/1.8/gems/compass-0.10.5/frameworks/compass/stylesheets"b/Library/Ruby/Gems/1.8/gems/compass-0.10.5/frameworks/_compass_deprecated_imports/stylesheets"T/Users/ncooley/Desktop/projects/forresterProd/lib_fe/sass/../themes/stylesheets:@children[o:Sass::Tree::ImportNode
+;0;@;[ :@imported_filename"../global:
+@lineio;
+;0;@;[ ;"form-sliders;io:Sass::Tree::VariableNode:
+@expro:Sass::Script::Color
+:@value0:@context:default;{ :@attrs{	:	blueiî:rediî:
+alphai:
+greeniî;i	:
+@name"form_bg_color;@;[ ;i	:@guarded0o;;o;
+;0;;;{ ;{	;iÝ;iÝ; i;!iÝ;i
+;""form_light;@;[ ;i
+;#0o;;o;
+;0;;;{ ;{	;i8;i8; i;!i8;i;""form_dark;@;[ ;i;#0o;;o:Sass::Script::String
+;"ž.x-input-text, .x-input, .x-input-number, .x-spinner-body, .x-input-radio, .x-input-checkbox, .x-input-email, .x-input-url, .x-input-password, .x-input-slider;;;{ ;i:
+@type:string;""form_input_fields;@;[ ;i;#0o;;o;$
+;"&.x-input-radio, .x-input-checkbox;;;{ ;i;%;&;""form_masked_fields;@;[ ;i;#0o;;o;$
+;"H.x-field-slider, .x-field-toggle, .x-field-checkbox, .x-field-radio;;;{ ;i;%;&;""form_scrollable_fields;@;[ ;i;#0o;;o:Sass::Script::Number:@numerator_units["em;i;;;{ :@original"6em;i:@denominator_units[ ;""form_label_width;@;[ ;i;#"!defaulto;;o;';(["em;f2.5;;;{ ;)"
+2.5em;i;*[ ;""form_field_height;@;[ ;i;#"!defaulto;;o;';(["em;f0.59999999999999998 33;;;{ ;)"
+0.6em;i;*[ ;""form_spacing;@;[ ;i;#0o;;o;';(["em;f2.2000000000000002 ™š;;;{ ;)"
+2.2em;i;*[ ;""thumbsize;@;[ ;i;#"!defaulto;;o:Sass::Script::Operation:@operand1o:Sass::Script::Variable	;;;""thumbsize;{ ;i;;;@k;i:@operand2o;';(["em;f0.34999999999999998 ff;;;@k;)"0.35em;i;*[ :@operator:
+minus;""togglesize;@;[ ;i;#0o;;o;+;,o;-	;;;""thumbsize;{ ;i;;;@x;i;.o;';(["em;i;;;@x;)"1em;i;*[ ;/;0;""checkheight;@;[ ;i;#0o;;o;+;,o;+;,o;-	;;;""thumbsize;{ ;i;;;@€;i;.o;-	;;;""togglesize;@€;i;/;0;;;@€;i;.o;';([ ;i;;;@€;)"2;i;*[ ;/:div;""thumbspace;@;[ ;i;#0o;;o;';(["em;f0.40000000000000002 ™š;;;{ ;)"
+0.4em;i;*[ ;""form_fieldset_radius;@;[ ;i;#"!defaulto:Sass::Tree::MixinDefNode;""
+label;@;[o:Sass::Tree::PropNode;o;$;"#fff 0 1px 1px;;;%:identifier;"["text-shadow;@:
+@tabsi ;[ ;i:@prop_syntax:newo;3;o;-	;;;""form_dark;{ ;i;"["
+color;@;5i ;[ ;i;6;7:
+@args[ :@has_childrenT;io;2;""sencha-form;@;[/o:Sass::Tree::RuleNode;@;5i ;[o;3;o;$;"1em;;;%;4;"["padding;@;5i ;[ ;i%;6;7o;3;o;-	;;;""form_bg_color;{ ;i&;"["background-color;@;5i ;[ ;i&;6;7;9T;i$:
+@rule[".x-form .x-panel-bodyo;:;@;5i ;[
+o;3;o;-	;;;""form_field_height;{ ;i*;"["min-height;@;5i ;[ ;i*;6;7o;3;o;$;"	100%;;;%;4;"["
+width;@;5i ;[ ;i+;6;7o;3;o;$;"
+block;;;%;4;"["display;@;5i ;[ ;i,;6;7o;3;o;$;"#fff none;;;%;4;"["background;@;5i ;[ ;i-;6;7o;3;o;$;"	none;;;%;4;"["-webkit-appearance;@;5i ;[ ;i.;6;7;9T;i);;[".x-input-elo;:;@;5i ;[
+o;3;o;$;"hidden;;;%;4;"["overflow;@;5i ;[ ;i2;6;7o;3;o;$;"relative;;;%;4;"["position;@;5i ;[ ;i3;6;7o;3;o;-	;;;""form_field_height;{ ;i4;"["min-height;@;5i ;[ ;i4;6;7o;3;o;+;,o;+;,o;';(["px;i;;;{ ;)"1px;i5;*[ ;;;@÷;i5;.o;$
+;"
+solid;;;@÷;i5;%;4;/:concat;;;@÷;i5;.o;-	;;;""form_light;@÷;i5;/;<;"["border-bottom;@;5i ;[ ;i5;6;7o;:;@;5i ;[	o:Sass::Tree::ExtendNode	:@selector["."x-input-el;@;[ ;i8o:Sass::Tree::MixinNode
+;""border-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;i9;*[ ;i9o;3;o;$;"	.4em;;;%;4;"["padding;@;5i ;[ ;i:;6;7o;3;o;$;"0;;;%;4;"["border;@;5i ;[ ;i;;6;7;9T;i7;;["-input, textarea, select, .x-field-slider;9T;i1;;[".x-fieldo;:;@;5i ;[o;3;o;$;"0;;;%;4;"["border-bottom;@;5i ;[ ;i@;6;7;9T;i?;;[".x-field:last-childo;:;@;5i ;[o;?
+;""stretch;@;[ ;8[ ;iD;9T;iC;;[".x-field-masko;:;@;5i ;[o;:;@;5i ;[o;=	;>["."x-hidden-display;@;[ ;iI;9T;iH;;[".x-field-mask;9T;iG;;[o;-	;;;""form_scrollable_fields;{ ;iGo:Sass::Tree::CommentNode:@silenti ;"/* Hidden fields */;@;[ ;iM:@lines[ o;:;@;5i ;[o;=	;>["."x-hidden-display;@;[ ;iP;9T;iO;;[".x-field-hiddeno;:;@;5i ;[o;3;o;$;"1em 0 1.5em;;;%;4;"["margin;@;5i ;[ ;iU;6;7o;:;@;5i ;[
+o;3;o;+;,o;+;,o;';(["px;i;;;{ ;)"1px;iX;*[ ;;;@_;iX;.o;$
+;"
+solid;;;@_;iX;%;4;/;<;;;@_;iX;.o;-	;;;""form_light;@_;iX;/;<;"["border;@;5i ;[ ;iX;6;7o;3;o;$;"0;;;%;4;"["padding;@;5i ;[ ;iY;6;7o:Sass::Tree::IfNode;o;-	;;;""include_highlights;{ ;iZ;@;[o;3;o;+;,o;+;,o;+;,o:Sass::Script::Funcall
+;;;""	rgba;{ ;8[	o;';([ ;iÿ;;;@z;)"255;i[;*[ o;';([ ;iÿ;;;@z;)"255;i[;*[ o;';([ ;iÿ;;;@z;)"255;i[;*[ o;';([ ;f0.69999999999999996 ff;;;@z;)"0.7;i[;*[ ;i[;;;@z;i[;.o;';([ ;i ;;;@z;)"0;i[;*[ ;/;<;;;@z;i[;.o;';(["px;i;;;@z;)"1px;i[;*[ ;/;<;;;@z;i[;.o;';([ ;i ;;;@z;)"0;i[;*[ ;/;<;"["-webkit-box-shadow;@;5i ;[ ;i[;6;7;9T;iZ:@last_else@oo;?
+;""border-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;i^;i^o;3;o;$;"hidden;;;%;4;"["overflow;@;5i ;[ ;i_;6;7;9T;iW;;[".x-panel-body;9T;iS;;[".x-form-fieldseto;:;@;5i ;[	o;?
+;""
+label;@;[ ;8[ ;ido;3;o;+;,o;+;,o;';(["em;i;;;{ ;)"1em;ie;*[ ;;;@º;ie;.o;+;,o;-	;;;""form_spacing;@º;ie;;;@º;ie;.o;';(["em;f0.10000000000000001 ™š;;;@º;)"
+0.1em;ie;*[ ;/:	plus;/;<;;;@º;ie;.o;';(["em;f0.29999999999999999 33;;;@º;)"
+0.3em;ie;*[ ;/;<;"["margin;@;5i ;[ ;ie;6;7o;3;o;-	;;;""form_dark;{ ;if;"["
+color;@;5i ;[ ;if;6;7o;3;o;$;"	bold;;;%;4;"["font-weight;@;5i ;[ ;ig;6;7;9T;ic;;[".x-form-fieldset-titleo;:;@;5i ;[
+o;?
+;""
+label;@;[ ;8[ ;iko;3;o;D
+;;;""lighten;{ ;8[o;-	;;;""form_dark;@ç;ilo;';(["%;i#;;;@ç;)"30%;il;*[ ;il;"["
+color;@;5i ;[ ;il;6;7o;3;o;+;,o;+;,o;';(["em;i;;;{ ;)"1em;im;*[ ;;;@ù;im;.o;+;,o;-	;;;""form_spacing;@ù;im;;;@ù;im;.o;';(["em;f0.10000000000000001 ™š;;;@ù;)"
+0.1em;im;*[ ;/;F;/;<;;;@ù;im;.o;';(["em;f0.29999999999999999 33;;;@ù;)"
+0.3em;im;*[ ;/;<;"["margin;@;5i ;[ ;im;6;7o;3;o;$;"	.8em;;;%;4;"["font-size;@;5i ;[ ;in;6;7o;3;o;$;"center;;;%;4;"["text-align;@;5i ;[ ;io;6;7;9T;ij;;["".x-form-fieldset-instructionso;:;@;5i ;[o;?
+;""
+label;@;[ ;8[ ;iso;?
+;""bevel_text;@;[ ;8[o;$
+;"
+light;;;{ ;it;%;&;ito;3;o;D
+;;;""lighten;{ ;8[o;-	;;;""form_light;@,;iuo;';(["%;i;;;@,;)"10%;iu;*[ ;iu;"["background-color;@;5i ;[ ;iu;6;7o;3;o;-	;;;""form_spacing;{ ;iv;"["padding;@;5i ;[ ;iv;6;7o;3;o;+;,o;+;,o;';(["px;i;;;{ ;)"1px;iw;*[ ;;;@E;iw;.o;$
+;"
+solid;;;@E;iw;%;4;/;<;;;@E;iw;.o;D
+;;;""lighten;@E;8[o;-	;;;""form_light;@E;iwo;';(["%;i;;;@E;)"20%;iw;*[ ;iw;/;<;"["border-top;@;5i ;[ ;iw;6;7o;3;o;$;"
+block;;;%;4;"["display;@;5i ;[ ;ix;6;7o;:;@;5i ;[o;3;o;$;"	.8em;;;%;4;"["font-size;@;5i ;[ ;i{;6;7o;3;o;$;"	bold;;;%;4;"["font-weight;@;5i ;[ ;i|;6;7;9T;iz;;["	span;9T;ir;;[".x-form-labelo;:;@;5i ;[o;?
+;""display-box;@;[ ;8[ ;i|;9T;i{;;[".x-fieldo;:;@;5i ;[	o;?
+;""box-orient;@;[ ;8[o;$
+;"horizontal;;;{ ;i€;%;4;i€o;?
+;""box-align;@;[ ;8[o;$
+;"stretch;;;{ ;i;%;4;io;:;@;5i ;[o;3;o;-	;;;""form_label_width;{ ;i„;"["
+width;@;5i ;[ ;i„;6;7;9T;iƒ;;["
+labelo;:;@;5i ;[o;?
+;""box-flex;@;[ ;8[o;';([ ;i;;;{ ;)"1;iˆ;*[ ;iˆ;9T;i‡;;[o;-	;;;""form_input_fields;{ ;i‡;9T;i;;["..x-label-align-left, .x-label-align-righto;@;Ai ;"F/* Round the corners on fieldsets.
+ * Warning: It ain't pretty */;@;[ ;iŒ;B[ o;;o: Sass::Script::Interpolation:@whitespace_beforei¹:@after0;{ :@originally_textF:	@mido;-	;;;""form_input_fields;@©;i;i:@whitespace_after0:@before0;""form_rounded_elements;@;[ ;i;#0o;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-top-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;i“;i“;9T;i’;;[o;-	;;;""form_rounded_elements;{ ;i’"), &.x-field-toggle, &.x-field-slider;9T;i‘;;[".x-field:first-childo;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-bottom-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;i˜;i˜;9T;i—;;[o;-	;;;""form_rounded_elements;{ ;i—"), &.x-field-toggle, &.x-field-slider;9T;i–;;[".x-field:last-childo;:;@;5i ;[o;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-top-left-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;iž;iž;9T;i;;[".x-form-labelo;:;@;5i ;[o;?
+;""border-top-left-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;i¡;*[ ;i¡;9T;i ;;[o;-	;;;""form_rounded_elements;{ ;i "), &.x-field-toggle, &.x-field-slider;9T;iœ;;["&:first-childo;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-bottom-left-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;i¦;i¦;9T;i¥;;[".x-form-labelo;:;@;5i ;[o;?
+;""border-bottom-left-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;i©;*[ ;i©;9T;i¨;;[o;-	;;;""form_rounded_elements;{ ;i¨"), &.x-field-toggle, &.x-field-slider;9T;i¤;;["&:last-child;9T;i›;;[".x-label-align-lefto;:;@;5i ;[	o;?
+;""box-direction;@;[ ;8[o;$
+;"reverse;;;{ ;i®;%;4;i®o;?
+;""box-pack;@;[ ;8[o;$
+;"end;;;{ ;i¯;%;4;i¯o;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-top-right-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;i²;i²;9T;i±;;[".x-form-labelo;:;@;5i ;[o;?
+;""border-top-right-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;iµ;*[ ;iµ;9T;i´;;[o;-	;;;""form_rounded_elements;{ ;i´;9T;i°;;["&:first-childo;:;@;5i ;[o;:;@;5i ;[o;?
+;""border-bottom-right-radius;@;[ ;8[o;-	;;;""form_fieldset_radius;{ ;iº;iº;9T;i¹;;[".x-form-labelo;:;@;5i ;[o;?
+;""border-bottom-right-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;i½;*[ ;i½;9T;i¼;;[o;-	;;;""form_rounded_elements;{ ;i¼;9T;i¸;;["&:last-child;9T;i­;;[".x-label-align-righto;:;@;5i ;[o;?
+;""box-orient;@;[ ;8[o;$
+;"vertical;;;{ ;iÃ;%;4;iÃ;9T;iÂ;;["..x-label-align-top, .x-label-align-bottomo;:;@;5i ;[o;?
+;""box-direction;@;[ ;8[o;$
+;"reverse;;;{ ;iÆ;%;4;iÆ;9T;iÅ;;[".x-label-align-bottomo;@;Ai ;"/* Required fields */;@;[ ;iÉ;B[ o;:;@;5i ;[o;:;@;5i ;[o;3;o;$;""*";;;%;4;"["content;@;5i ;[ ;iÍ;6;7o;3;o;$;"inline;;;%;4;"["display;@;5i ;[ ;iÎ;6;7;9T;iÌ;;["label:aftero;:;@;5i ;[o;@;Ai ;"/* color: $base_color; */;@;[ ;iÑ;B[ ;9T;iÐ;;["
+label;9T;iË;;[".x-field-requiredo;@;Ai ;"9/* Create the dropdown arrow
+ * for select fields */;@;[ ;iÕ;B[ o;:;@;5i ;[	o;@;Ai ;"/* Tip */;@;[ ;iÙ;B[ o;:;@;5i ;[o;?
+;""insertion;@;[ ;8[	o;';([ ;i ;;;{ ;)"0;iÛ;*[ o;';([ ;i ;;;@ª;)"0;iÛ;*[ o;';([ ;i ;;;@ª;)"0;iÛ;*[ o;$
+;"	auto;;;@ª;iÛ;%;4;iÛo;3;o;$;"0;;;%;4;"["
+right;@;5i ;[ ;iÜ;6;7o;3;o;$;"absolute;;;%;4;"["position;@;5i ;[ ;iÝ;6;7o;3;o;$;"
+block;;;%;4;"["display;@;5i ;[ ;iÞ;6;7o;3;o;$;"1em;;;%;4;"["margin;@;5i ;[ ;iß;6;7o;3;o;$;".4em solid transparent;;;%;4;"["border;@;5i ;[ ;ià;6;7o;3;o;-	;;;""form_light;{ ;iá;"["border-top-color;@;5i ;[ ;iá;6;7o;3;o;$;"1;;;%;4;"["z-index;@;5i ;[ ;iâ;6;7;9T;iÚ;;["&:aftero;:;@;5i ;[o;3;o;-	;;;""form_label_width;{ ;iæ;"["
+right;@;5i ;[ ;iæ;6;7;9T;iå;;[" &.x-label-align-right:aftero;:;@;5i ;[o;3;o;$;"	auto;;;%;4;"["top;@;5i ;[ ;iê;6;7o;3;o;$;"0;;;%;4;"["bottom;@;5i ;[ ;ië;6;7;9T;ié;;["&.x-label-align-top:after;9T;i×;;[".x-field-selecto;:;@;5i ;[o;:;@;5i ;[o;3;o;$;".5;;;%;4;"["opacity;@;5i ;[ ;iñ;6;7;9T;ið;;["9label span, input, .x-spinner-body, select, textarea;9T;iï;;[".x-item-disabledo;:;@;5i ;[o;:;@;5i ;[o;3;o;-	;;;""txtareaheight;{ ;i÷;"["min-height;@;5i ;[ ;i÷;6;7o;3;o;$;"	.5em;;;%;4;"["padding-top;@;5i ;[ ;iø;6;7;9T;iö;;["textarea;9T;iõ;;[".x-field-textareao;:;@;5i ;[o;:;@;5i ;[
+o;?
+;""insertion;@;[ ;8[	o;';(["em;f1.3 ÌÍ;;;{ ;)"
+1.3em;iþ;*[ o;';(["em;f1.3 ÌÍ;;;@0;)"
+1.3em;iþ;*[ o;';(["em;f0.80000000000000004 ™š;;;@0;)"
+0.8em;iþ;*[ o;$
+;"	auto;;;@0;iþ;%;4;iþo;3;o;-	;;;""form_spacing;{ ;iÿ;"["
+right;@;5i ;[ ;iÿ;6;7o;3;o;+;,o;D
+;;;""theme-image;{ ;8[o;-	;;;""theme_name;@L;i o;$
+;"check.png;;;@L;i ;%;&;i ;;;@L;i ;.o;$
+;"no-repeat;;;@L;i ;%;4;/;<;"["-webkit-mask;@;5i ;[ ;i ;6;7o;3;o;$;"1.3em auto;;;%;4;"["-webkit-mask-size;@;5i ;[ ;i;6;7o;?
+;""bg_gradient;@;[ ;8[o;-	;;;""form_light;{ ;io;$
+;"	flat;;;@c;i;%;&;i;9T;iý;;["&:aftero;:;@;5i ;[o;?
+;""bg_gradient;@;[ ;8[o;-	;;;""active_color;{ ;io;$
+;"	flat;;;@p;i;%;&;i;9T;i;;["&:checked:after;9T;iü;;["8.x-field .x-input-radio, .x-field .x-input-checkboxo;:;@;5i ;[o;3;o;$;"	auto;;;%;4;"["
+right;@;5i ;[ ;i;6;7o;3;o;-	;;;""form_spacing;{ ;i;"["	left;@;5i ;[ ;i;6;7;9T;i
+;;["\.x-label-align-right .x-input-radio:after, .x-label-align-right .x-input-checkbox:aftero;@;Ai ;"/* Spinner */;@;[ ;i;B[ o;:;@;5i ;[o;3;o;+;,o;+;,o;';(["px;i;;;{ ;)"1px;i;*[ ;;;@”;i;.o;$
+;"
+solid;;;@”;i;%;4;/;<;;;@”;i;.o;-	;;;""form_light;@”;i;/;<;"["border-bottom;@;5i ;[ ;i;6;7;9T;i;;[".x-spinnero;:;@;5i ;[o;?
+;""display-box;@;[ ;8[ ;io;?
+;""box-direction;@;[ ;8[o;$
+;"normal;;;{ ;i;%;4;i;9T;i;;[".x-spinner .x-spinner-bodyo;:;@;5i ;[o;?
+;""box-orient;@;[ ;8[o;$
+;"horizontal;;;{ ;i;%;4;io;?
+;""box-align;@;[ ;8[o;$
+;"stretch;;;{ ;i;%;4;io;3;o;$;"center;;;%;4;"["text-align;@;5i ;[ ;i;6;7o;:;@;5i ;[o;3;o;$;"
+1.3em;;;%;4;"["font-size;@;5i ;[ ;i;6;7o;3;o;$;"	bold;;;%;4;"["font-weight;@;5i ;[ ;i ;6;7o;?
+;""bevel_text;@;[ ;8[o;$
+;"
+light;;;{ ;i!;%;&;i!;9T;i;;["	spano;:;@;5i ;[o;3;o;$;"3em;;;%;4;"["
+width;@;5i ;[ ;i%;6;7o;3;o;$;"0;;;%;4;"["padding;@;5i ;[ ;i&;6;7o;3;o;$;"0;;;%;4;"["border-right;@;5i ;[ ;i';6;7o;3;o;$;"0;;;%;4;"["border-left;@;5i ;[ ;i(;6;7o;?
+;""border-radius;@;[ ;8[o;';([ ;i ;;;{ ;)"0;i);*[ ;i)o;3;o;-	;;;""form_light;{ ;i*;"["border-color;@;5i ;[ ;i*;6;7o;3;o;$;"center;;;%;4;"["text-align;@;5i ;[ ;i+;6;7;9T;i$;;["
+inputo;:;@;5i ;[	o;?
+;""box-flex;@;[ ;8[o;';([ ;i;;;{ ;)"1;i/;*[ ;i/o;3;o;$;"	bold;;;%;4;"["font-weight;@;5i ;[ ;i0;6;7o;3;o;$;".3em 0;;;%;4;"["padding;@;5i ;[ ;i1;6;7o;?
+;""toolbar_button;@;[ ;8[o;-	;;;""form_light;{ ;i2;i2;9T;i.;;["#.x-spinner-down, .x-spinner-upo;:;@;5i ;[o;3;o;$;"0;;;%;4;"["border-left;@;5i ;[ ;i5;6;7;9T;i4;;[".x-spinner-downo;:;@;5i ;[o;3;o;$;"0;;;%;4;"["border-right;@;5i ;[ ;i8;6;7;9T;i7;;[".x-spinner-up;9T;i;;[".x-spinner-bodyo;;o;';(["em;f1.1000000000000001 ™š;;;{ ;)"
+1.1em;i<;*[ ;""form_clear_size;@;[ ;i<;#0o;:;@;5i ;[o;3;o;-	;;;""form_clear_size;{ ;i?;"["
+width;@;5i ;[ ;i?;6;7o;3;o;-	;;;""form_clear_size;{ ;i@;"["height;@;5i ;[ ;i@;6;7o;?
+;""border-radius;@;[ ;8[o;+;,o;-	;;;""form_clear_size;{ ;iA;;;@e;iA;.o;';([ ;i;;;@e;)"2;iA;*[ ;/;1;iAo;3;o;D
+;;;""	rgba;{ ;8[o;
+;0;;;@m;{	;i ;i ; i;!i ;iBo;';([ ;f0.14999999999999999 33;;;@m;)"	0.15;iB;*[ ;iB;"["background-color;@;5i ;[ ;iB;6;7o;3;o;$;"	#fff;;;%;4;"["
+color;@;5i ;[ ;iC;6;7o;3;o;$;"absolute;;;%;4;"["position;@;5i ;[ ;iD;6;7o;3;o;$;"	bold;;;%;4;"["font-weight;@;5i ;[ ;iE;6;7o;3;o;$;"	.9em;;;%;4;"["line-height;@;5i ;[ ;iF;6;7o;3;o;$;"center;;;%;4;"["text-align;@;5i ;[ ;iG;6;7;9T;i>;;[".x-field-clearo;:;@;5i ;[o;3;o;+;,o;-	;;;""form_clear_size;{ ;iK;;;@Ÿ;iK;.o;-	;;;""form_spacing;@Ÿ;iK;/;F;"["padding-right;@;5i ;[ ;iK;6;7;9T;iJ;;["/.x-field-clearable input.x-field-clearableo;:;@;5i ;[o;:;@;5i ;[o;3;o;$;"	.4em;;;%;4;"["
+right;@;5i ;[ ;iP;6;7o;3;o;$;"	.7em;;;%;4;"["top;@;5i ;[ ;iQ;6;7;9T;iO;;[".x-field-clear;9T;iN;;["C.x-label-align-left, .x-label-align-top, .x-label-align-bottomo;:;@;5i ;[o;3;o;$;"	auto;;;%;4;"["top;@;5i ;[ ;iU;6;7o;3;o;$;"	.7em;;;%;4;"["bottom;@;5i ;[ ;iV;6;7;9T;iT;;["&.x-label-align-top .x-field-clearo;:;@;5i ;[o;3;o;-	;;;""form_spacing;{ ;iZ;"["top;@;5i ;[ ;iZ;6;7o;3;o;+;,o;-	;;;""form_spacing;{ ;i[;;;@Ø;i[;.o;-	;;;""form_label_width;@Ø;i[;/;F;"["
+right;@;5i ;[ ;i[;6;7;9T;iY;;["(.x-label-align-right .x-field-clearo;C;o;-	;;;""include_sliders;{ ;i^;@;[o;?
+;""sencha-form-sliders;@;[ ;8[ ;i_;9T;i^;E@ào;:;@;5i ;[o;3;o;$;"
+200px;;;%;4;"["min-width;@;5i ;[ ;ie;6;7;9T;id;;[".x-select-overlay;8[[o;-;;;""include_sliders;{ o;-	;;;""include_form_sliders;@÷;i";9T;i";9T;i

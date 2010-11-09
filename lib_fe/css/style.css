@@ -1,0 +1,123 @@
+/* 
+
+orange: #F06627;
+
+*/
+
+/* Actual page styles */
+body {background:#fff;}
+.noWebkitBrowser {width:100%; background: #000;}
+/* * {font-family: "Arial, Helvetica" !important;} */
+    .x-fullscreen {background:#fff;}  
+    .loading{background:rgba(0, 0, 0, 0.3) url(../img/loading.gif) center center no-repeat;display:block;width:10em;height:10em;position:absolute;top:50%;left:50%;margin-left:-5em;margin-top:-5em;-webkit-border-radius:.5em;color:#fff;text-shadow:#000 0 1px 1px;text-align:center;padding-top:8em;font-weight:bold}
+    .listAuthors {background: #fff; font-size:11px; border-bottom:1px solid #e5e5e5; padding:10px; -webkit-border-radius: 5px;}
+    .listAuthors div.ranking {height:auto !important;}
+     
+    .x-list.x-list-flat .x-list-parent .ranking {background-image:url(../img/ranking.png); background-repeat:no-repeat; padding-left:43px; display:block;}
+    .li1 {background-position:0 16px;}
+    .li2 {background-position:0 -29px;}
+    .li3 {background-position:0 -76px;}
+    .li4 {background-position:0 -125px;}
+    .li5 {background-position:0 -170px;}
+    .li6 {background-position:0 -220px;}
+    .li7 {background-position:0 -264px;}
+    .li8 {background-position:0 -314px;}
+    .li9 {background-position:0 -355px;}
+    .li10 {background-position:0 -400px;}
+    
+    
+    .authorDetails .authorDetails {padding:0;}
+    .authorDetails {background: #878787; color:#fff; padding:10px; }
+    .ranking .authorDetails, table.authorDetails {background:none; color: #494949; padding:0;}   
+     .authorDetails img {float:left; margin-right:10px;}
+     .authorDetails h2 {font-weight:bold; font-size:1.25em;}
+    .x-phone  .x-docked .authorDetails h2 { font-size:1em;}
+    
+    table.authorDetails { border-collapse:separate ;-webkit-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3); -webkit-border-radius: 15px;}
+    table.authorDetails  {}
+    table.authorDetails td{padding:15px; border-bottom:1px solid #e5e5e5;}
+    table.authorDetails tr.stats td {text-align:center;}
+    table.authorDetails tr.stats > :first-child {border-right:1px solid #e5e5e5;}
+    table.authorDetails tr.top td {border:none; border-bottom:1px solid #e5e5e5;}
+    table.authorDetails tr.bot td {border:none !important; }
+    
+    table.authorDetails span {color: #F06627;}
+    table.authorDetails td.attendee {background:url(../img/icons.png) 0 -350px no-repeat;}
+    
+    
+    .x-list.channelList .chItem div {background-image: url(../img/icons.png); background-repeat: no-repeat;}  
+    
+    .x-list.channelList.chListLocked .chItem div {color: #a3a3a3;  background-position: right -49px ; }
+    .x-list.channelList .chItem div{color:#4f4f4f;  background-position: right -98px ;}
+    .x-list.channelList .chItem.branded div{color:#f06627;  background-position: right -5px; }
+    .x-list.channelList .chItem.x-item-selected div {color:#fff;}
+    
+    .tweetDetail .twDetail {padding: 20px;}
+    .tweetDetail .twDetail .tweet {margin-bottom: 30px;}
+    .unlockForm p {color: #fff;}
+    
+    .unlockForm  .x-form-fieldset .x-panel-body {border:none; -webkit-box-shadow: 0; background: none; }
+    .unlockForm.x-sheet .x-sheet-body .x-button {margin-bottom: 0;}
+    .formBase > .x-panel-body, div.formPanel {-webkit-border-radius: 10px; border:1px solid #d85419; background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(#f7a37d), to(#cf5228));}
+    .unlockForm .head {font-size: 11px; text-align:center; padding: 1.2em;}
+    div.formPanel {padding:20px; font-size:14px; text-align: center; }
+    .formBase .x-button-action {font-weight:normal; background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(#696969), to(#000));}
+    .formBase .x-form-fieldset {margin:.5em 0;}
+    .formBase .x-form-fieldset .x-panel-body { -webkit-box-shadow:rgba(216, 84, 25, 0.699) 0px 1px 0px; border:none; }
+    .formBase span {font-weight:normal;}
+
+
+    .x-list.x-list-flat .x-list-parent > div.tweet {height:auto;}
+    div.tweet img, .authorDetails img {width:48px; height:48px;}
+    div.tweet img, div.tweet .tweet-bubble {float:left; margin-right:15px;}
+    
+    .tweet a {color:#F06627; }
+    .sourceInfo a {color:#315d92; text-decoration:none;}
+    
+    div.tweet .tweet-bubble {width:90%; margin-right:0;}
+    div.tweet .tweet-content {float:left; width:100%;  margin-right:15px;}
+    
+    div.tweet p {font-size:1em; margin-bottom:.5em;}
+    div.tweet h2 {font-size:.75em; font-weight:normal;}
+    div.tweet .posted {font-size:.75em; color:#305d92;}
+    
+    .x-tablet div.tweet .tweet-bubble, .x-desktop div.tweet .tweet-bubble {width: 350px;}
+    .x-phone  div.tweet .tweet-bubble { width:auto; float:left; font-size: .75em;}
+    .x-phone  div.tweet .tweet-content {width:230px; }
+    .x-phone  div.tweet .posted {}
+    .x-phone  div.tweet img, .x-phone.x-ios .authorDetails img {width:30px; height:30px;}
+    
+    .x-desktop .isoMainToolbar, .x-tablet .isoMainToolbar {background:none; background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFB99A), color-stop(0.02, #FF7234), to(#DC4400));}
+    
+    .x-msgbox {z-index:20001 !important;}
+    
+    /*
+    .x-button img.x-icon-mask.info {-webkit-mask: url(../img/icons/info.png);}
+    
+    .x-button img.x-icon-mask.settings {-webkit-mask: url(../img/icons/settings.png);}*/ 
+    /* 
+    iphone: .x-phone .x-ios
+    android:.x-phone .x-android
+    iPad: .x-tablet .x-ios
+    */
+    
+    .x-sheet.unlockForm {background:url(../img/commonBg.jpg); background-color:#fff;}
+    .unlockBottomPan {color: #fff; background:#484848; }
+    .unlockBottomPan p {font-size:.65em; text-align:center;}
+    
+    .disclosure {background:url(../img/isobar_logo.png) top left no-repeat; margin-left:70px; padding-top: 40px; width:115px;  text-align:center;}
+    .x-html .disclosure a {color:#fff !important; font-size:11px;}
+    
+    .frmError {background:url(../img/icons.png) 0 -257px no-repeat; font-size: 12px; padding: 20px 0 20px 40px; }
+    
+/* clearfix hacks */
+
+.clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.clearfix { display: inline-block; }
+/* Hides from IE-mac \*/
+
+* html .clearfix { height: 1%; }
+.clearfix { display: block; }
+
+/* End hide from IE-mac */
+
