@@ -8,8 +8,39 @@
  * including itemtap, containertap, etc. as well as a built-in selection model. <b>In order to use these
  * features, an {@link #itemSelector} config must be provided for the DataView to determine what nodes it
  * will be working with.</b></p>
- * <p>Here is a simple example of a {@link #grouped} {@link Ext.List}:</p>
  * 
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #itemTpl}</li>
+ *   <li>{@link #store}</li>
+ *   <li>{@link #grouped}</li>
+ *   <li>{@link #indexBar}</li>
+ *   <li>{@link #singleSelect}</li>
+ *   <li>{@link #multiSelect}</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #bindStore}</li>
+ *   <li>{@link #getRecord}</li>
+ *   <li>{@link #getRecords}</li>
+ *   <li>{@link #getSelectedRecords}</li>
+ *   <li>{@link #getSelectedNodes}</li>
+ *   <li>{@link #indexOf}</li>
+ * </ul>
+ * 
+ * <h2>Useful Events</h2>
+ * <ul class="list">
+ *   <li>{@link #itemtap}</li>
+ *   <li>{@link #itemdoubletap}</li>
+ *   <li>{@link #itemswipe}</li>
+ *   <li>{@link #selectionchange}</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.List/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
 Ext.regModel('Contact', {
     fields: ['firstName', 'lastName']
@@ -32,35 +63,18 @@ var store = new Ext.data.JsonStore({
         {firstName: 'Dave',    lastName: 'Kaneda'},
         {firstName: 'Michael', lastName: 'Mullany'},
         {firstName: 'Abraham', lastName: 'Elias'},
-        {firstName: 'Jay',     lastName: 'Robinson'},
-        {firstName: 'Tommy',   lastName: 'Maintz'},
-        {firstName: 'Rob',     lastName: 'Dougan'},
-        {firstName: 'Ed',      lastName: 'Spencer'},
-        {firstName: 'Jamie',   lastName: 'Avins'},
-        {firstName: 'Aaron',   lastName: 'Conran'},
-        {firstName: 'Dave',    lastName: 'Kaneda'},
-        {firstName: 'Michael', lastName: 'Mullany'},
-        {firstName: 'Abraham', lastName: 'Elias'},
         {firstName: 'Jay',     lastName: 'Robinson'}
     ]
 });
 
 var list = new Ext.List({
-    tpl: '&lt;tpl for="."&gt;&lt;div class="contact"&gt;{firstName} &lt;strong&gt;{lastName}&lt;/strong&gt;&lt;/div&gt;&lt;/tpl&gt;',
-
-    itemSelector: 'div.contact',
-    singleSelect: true,
-    grouped     : true,
-    indexBar    : true,
+    fullscreen: true,
     
-    store: store,
+    itemTpl : '{firstName} {lastName}',
+    grouped : true,
+    indexBar: true,
     
-    floating     : true,
-    width        : 350,
-    height       : 370,
-    centered     : true,
-    modal        : true,
-    hideOnMaskTap: false
+    store: store
 });
 list.show();
    </code></pre>
@@ -153,8 +167,9 @@ var store = new Ext.data.JsonStore({
     
     /**
      * @cfg {String} itemSelector
-     * Not to be used.
      * @private
+     * @ignore
+     * Not to be used.
      */
     itemSelector: '.x-list-item',
     
@@ -243,7 +258,7 @@ var store = new Ext.data.JsonStore({
         
         //<debug>
         if (!Ext.isDefined(this.itemTpl)) {
-            throw new Error("Ext.List: itemTpl is a required configuration.")
+            throw new Error("Ext.List: itemTpl is a required configuration.");
         }
         // this check is not enitrely fool proof, does not account for spaces or multiple classes
         // if the check is done without "s then things like x-list-item-entity would throw exceptions that shouldn't have.

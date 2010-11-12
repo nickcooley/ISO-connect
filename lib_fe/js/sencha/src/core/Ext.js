@@ -6,11 +6,11 @@ Ext.apply(Ext, {
      * The version of the framework
      * @type String
      */
-    version : '0.9.9',
+    version : '1.0.0RC',
     versionDetail : {
-        major : 0,
-        minor : 9,
-        patch : 9
+        major : 1,
+        minor : 0,
+        patch : '0RC'
     },
     
     /**
@@ -400,14 +400,14 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
         return {
             width: window.innerWidth,
             height: window.innerHeight
-        }
+        };
     },
 
     getOffset: function() {
         return {
             x: window.pageXOffset,
             y: window.pageYOffset
-        }
+        };
     },
 
     scrollToTop: function(delay, fn) {
@@ -418,10 +418,11 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
                     setTimeout(fn, 0);
                 }
             }, delay);
-        } else {
+        }
+        else {
             window.scrollTo(0, Ext.is.Android ? -1 : 0);
             if (fn) {
-                setTimeout(fn, 0)
+                setTimeout(fn, 0);
             }
         }
     },
@@ -431,7 +432,8 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
 
         if (window.hasOwnProperty('orientation')) {
             return (window.orientation == 0 || window.orientation == 180) ? 'portrait' : 'landscape';
-        } else {
+        }
+        else {
             if (Ext.is.Android) {
                 if ((size.width == this.lastSize.width && size.height < this.lastSize.height) ||
                     (size.height == this.lastSize.height && size.width < this.lastSize.width)) {

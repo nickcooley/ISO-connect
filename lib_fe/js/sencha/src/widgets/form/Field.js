@@ -2,15 +2,13 @@
  * @class Ext.form.Field
  * @extends Ext.Container
  * <p>Base class for form fields that provides default event handling, sizing, value handling and other functionality. Ext.form.Field
- * is not used directly in applications, instead the subclasses such as {@link Ext.form.TextField} should be used.</p>
+ * is not used directly in applications, instead the subclasses such as {@link Ext.form.Text} should be used.</p>
  * @constructor
  * Creates a new Field
  * @param {Object} config Configuration options
  * @xtype field
  */
 Ext.form.Field = Ext.extend(Ext.Component,  {
-    ui: 'text',
-
     /**
      * Set to true on all Ext.form.Field subclasses. This is used by {@link Ext.form.FormPanel#getValues} to determine which
      * components inside a form are fields.
@@ -47,6 +45,8 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
     /**
      * @cfg {String} fieldCls The default CSS class for the field (defaults to 'x-form-field')
      */
+    fieldCls: 'x-form-field',
+
     baseCls: 'x-field',
 
     /**
@@ -56,40 +56,13 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
     inputCls: undefined,
 
     /**
-     * @cfg {String} focusCls The CSS class to use when the field receives focus (defaults to 'x-field-focus')
+     * @cfg {Boolean} disabled True to disable the field (defaults to false).
+     * <p>Be aware that conformant with the <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.12.1">HTML specification</a>,
+     * disabled Fields will not be {@link Ext.form.BasicForm#submit submitted}.</p>
      */
-    focusCls: 'x-field-focus',
-    
-    /**
-     * @cfg {Integer} maxLength The maximum number of permitted input characters (defaults to 0).
-     */
-    maxLength: 0,
-    
-    /**
-     * @cfg {String} placeHolder A string value displayed in the input (if supported) when the control is empty.
-     */
-    placeHolder: undefined,
-    
-    /**
-     * True to set the field's DOM element autocomplete attribute to "on", false to set to "off". Defaults to undefined, leaving the attribute unset
-     * @cfg {Boolean} autoComplete
-     */
-    autoComplete: undefined,
-    
-    /**
-     * True to set the field's DOM element autocapitalize attribute to "on", false to set to "off". Defaults to undefined, leaving the attribute unset
-     * @cfg {Boolean} autoCapitalize
-     */
-    autoCapitalize: undefined,
-    
-    /**
-     * True to set the field DOM element autocorrect attribute to "on", false to set to "off". Defaults to undefined, leaving the attribute unset.
-     * @cfg {Boolean} autoCorrect
-     */
-    autoCorrect: undefined,
+    disabled: false,
 
     renderTpl: [
-//        '<tpl if="label"><label <tpl if="fieldEl">for="{inputId}"</tpl> class="x-form-label"><span>{label}</span></label></tpl>',
         '<tpl if="label"><div class="x-form-label"><span>{label}</span></div></tpl>',
         '<tpl if="fieldEl">',
             '<div class="x-form-field-container"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}"',
@@ -100,26 +73,14 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
                 '<tpl if="autoComplete">autocomplete="{autoComplete}" </tpl>',
                 '<tpl if="autoCapitalize">autocapitalize="{autoCapitalize}" </tpl>',
                 '<tpl if="autoCorrect">autocorrect="{autoCorrect}" </tpl> />',
-            '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+            '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
             '</div>',
-            '<tpl if="showClear"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div><div></tpl>',
+            '<tpl if="useClearIcon"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div><div></tpl>',
         '</tpl>',
     ],
 
-    /**
-     * @cfg {Boolean} disabled True to disable the field (defaults to false).
-     * <p>Be aware that conformant with the <a href="http://www.w3.org/TR/html401/interact/forms.html#h-17.12.1">HTML specification</a>,
-     * disabled Fields will not be {@link Ext.form.BasicForm#submit submitted}.</p>
-     */
-    disabled: false,
-
     // @private
     isFormField: true,
-
-    /**
-     * @property {Boolean} <tt>True</tt> if the field currently has focus.
-     */
-    isFocused: false,
 
     /**
      * @cfg {Boolean} autoCreateField True to automatically create the field input element on render. This is true by default, but should
@@ -152,55 +113,33 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
      */
     required: false,
 
-    maskField: false,
+    useMask: false,
 
     // @private
     initComponent: function() {
-        //backwards compatibility - deprecate in next major release
-        this.label = this.label || this.fieldLabel;
+        //<deprecated since="0.99">
+        if (Ext.isDefined(this.fieldLabel)) {
+            console.warn("[Ext.form.Field] fieldLabel has been deprecated. Please use label instead.");
+            this.label = this.fieldLabel;
+        }
+
+        if (Ext.isDefined(this.fieldClass)) {
+            console.warn("[Ext.form.Field] fieldClass has been deprecated. Please use fieldCls instead.");
+            this.fieldCls = this.fieldClass;
+        }
+
+        if (Ext.isDefined(this.focusClass)) {
+            console.warn("[Ext.form.Field] focusClass has been deprecated. Please use focusCls instead.");
+            this.focusCls = this.focusClass;
+        }
+
+        if (Ext.isDefined(this.inputValue)) {
+            console.warn("[Ext.form.Field] inputValue has been deprecated. Please use value instead.");
+            this.value = this.inputValue;
+        }
+        //</deprecated>
 
         Ext.form.Field.superclass.initComponent.call(this);
-        this.addEvents(
-            /**
-             * @event focus
-             * Fires when this field receives input focus.
-             * @param {Ext.form.Field} this
-             */
-            'focus',
-            /**
-             * @event blur
-             * Fires when this field loses input focus.
-             * @param {Ext.form.Field} this
-             */
-            'blur',
-            /**
-             * @event change
-             * Fires just before the field blurs if the field value has changed.
-             * @param {Ext.form.Field} this
-             * @param {Mixed} newValue The new value
-             * @param {Mixed} oldValue The original value
-             */
-            'change',
-            /**
-             * @event keyup
-             * Fires when a key is released on the input element.
-             * @param {Ext.form.Field} this
-             * @param {Ext.EventObject} e
-             */
-            'keyup'
-        );
-        
-        //<debug>
-        if (Ext.isDefined(this.fieldClass)) {
-            throw "Field: fieldClass has been deprecated. Please use fieldCls.";
-        }
-        //</debug>
-        
-        //<debug>
-        if (Ext.isDefined(this.focusClass)) {
-            throw "Field: focusClass has been deprecated. Please use focusCls.";
-        }
-        //</debug>
     },
 
     /**
@@ -219,65 +158,45 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         this.renderSelectors = Ext.applyIf(this.renderSelectors || {}, {
             mask: '.x-field-mask',
             labelEl: 'label',
-            clearEl: '.x-field-clear',
-            clearContainerEl: '.x-field-clear-container',
             fieldEl: '.' + Ext.util.Format.trim(this.renderData.fieldCls).replace(/ /g, '.')
         });
+
         Ext.form.Field.superclass.applyRenderSelectors.call(this);
     },
     
     initRenderData: function() {
-        var renderData     = Ext.form.Field.superclass.initRenderData.call(this),
-            autoComplete   = this.autoComplete,
-            autoCapitalize = this.autoCapitalize,
-            autoCorrect    = this.autoCorrect;
+        Ext.form.Field.superclass.initRenderData.apply(this, arguments);
         
-        Ext.applyIf(renderData, {
-            disabled:   this.disabled,
-            fieldCls:   'x-input-' + this.inputType + (this.inputCls ? ' ' + this.inputCls: ''),
-            fieldEl:    !this.fieldEl && this.autoCreateField,
-            inputId:    Ext.id(),
-            label:      this.label,
-            labelAlign: 'x-label-align-' + this.labelAlign,
-            name:       this.name || this.id,
-            placeHolder: this.placeHolder,
-            required:   this.required,
-            style:      this.style,
-            tabIndex:   this.tabIndex,
-            maxlength: this.maxLength,
-            inputType:       this.inputType,
-            maskField:  this.maskField,
-            showClear:  this.showClear
+        Ext.applyIf(this.renderData, {
+            disabled    :   this.disabled,
+            fieldCls    :   'x-input-' + this.inputType + (this.inputCls ? ' ' + this.inputCls: ''),
+            fieldEl     :   !this.fieldEl && this.autoCreateField,
+            inputId     :   Ext.id(),
+            label       :    this.label,
+            labelAlign  :   'x-label-align-' + this.labelAlign,
+            name        :   this.getName(),
+            required    :   this.required,
+            style       :   this.style,
+            tabIndex    :   this.tabIndex,
+            inputType   :   this.inputType,
+            useMask     :   this.useMask
         });
         
-        var positive = /true|on/i;
-        
-        if (autoComplete !== undefined) {
-            renderData.autoComplete = positive.test(autoComplete + '') ? 'on': 'off';
-        }
-        
-        if (autoCapitalize !== undefined) {
-            renderData.autoCapitalize = positive.test(autoCapitalize + '') ? 'on': 'off';
-        }
-        
-        if (autoCorrect !== undefined) {
-            renderData.autoCorrect = positive.test(autoCorrect + '') ? 'on': 'off';
-        }
-        
-        this.renderData = renderData;
-        return renderData;
+        return this.renderData;
     },
     
     onRender: function() {
         Ext.form.Field.superclass.onRender.apply(this, arguments);
         
         var cls = [];
+        
         if (this.required) {
             cls.push('x-field-required');
         }
         if (this.label) {
             cls.push('x-label-align-' + this.labelAlign);
         }
+
         this.el.addCls(cls);
     },
     
@@ -285,52 +204,32 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         Ext.form.Field.superclass.initEvents.call(this);
         
         if (this.fieldEl) {
-            this.mon(this.fieldEl, {
-                focus: this.onFocus,
-                blur: this.onBlur,
-                keyup: this.onKeyUp,
-                paste: this.checkClear,
-                mousedown: this.onBeforeFocus,
-                scope: this
-            });
-
-            if (this.maskField && this.mask) {
+            if (this.useMask && this.mask) {
                 this.mon(this.mask, {
                     click: this.onMaskTap,
                     scope: this
                 });
             }
-            
-            if(this.clearEl){
-                this.mon(this.clearContainerEl, {
-                    scope: this,
-                    tap: this.onClearTap    
-                });
-            }
         }        
+    },
+
+    isDisabled: function() {
+        return this.disabled;
     },
 
     // @private
     onEnable: function() {
-        this.el.removeCls(this.disabledCls);
-        this.el.dom.disabled = false;
         this.fieldEl.dom.disabled = false;
-        this.checkClear();
     },
 
     // @private
     onDisable: function() {
-        this.el.addCls(this.disabledCls);
-        this.el.dom.disabled = true;
         this.fieldEl.dom.disabled = true;
-        this.checkClear(true);
     },
 
     // @private
     initValue: function() {
-        if (this.value !== undefined) {
-            this.setValue(this.value, true);
-        }
+        this.setValue(this.value || '', true);
 
         /**
          * The original value of the field as configured in the {@link #value} configuration, or
@@ -356,47 +255,15 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         if (this.disabled || !this.rendered) {
             return false;
         }
+        
         return String(this.getValue()) !== String(this.originalValue);
-    },
-    
-    onClearTap: function() {
-        if (!this.disabled) {
-            this.setValue('');
-        }
-    },
-    
-    checkClear: function(force){
-        var clearEl = this.clearEl,
-            fieldEl = this.fieldEl,
-            value = this.getValue();
-
-        if (!(clearEl && fieldEl)) {
-            return;
-        }
-
-        value = Ext.isEmpty(value) ? '': String(value);
-
-        if (force || value.length === 0){
-            clearEl.addCls('x-hidden-visibility');
-            fieldEl.removeCls('x-field-clearable');
-        }
-        else{
-            clearEl.removeCls('x-hidden-visibility');
-            fieldEl.addCls('x-field-clearable');
-        }
-          
     },
 
     // @private
     afterRender: function() {
         Ext.form.Field.superclass.afterRender.call(this);
+        
         this.initValue();
-        this.checkClear();
-    },
-
-    onKeyUp: function(e) {
-        this.checkClear();
-        this.fireEvent('keyup', this, e);
     },
 
     onMaskTap: function(e) {
@@ -430,120 +297,30 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         this.setValue(this.originalValue);
     },
 
-    // @private
-    onBeforeFocus: function(e) {
-        this.fireEvent('beforefocus', e);
-    },
-
-    beforeFocus: Ext.emptyFn,
-    
-    // @private
-    onFocus: function(e) {
-        if (this.mask) {
-            if (this.maskCorrectionTimer) {
-                clearTimeout(this.maskCorrectionTimer);
-            }
-
-            this.hideMask();
-        }
-        
-        this.beforeFocus();
-        
-        if (this.focusCls) {
-            this.el.addCls(this.focusCls);
-        }
-
-        if (!this.isFocused) {
-            this.isFocused = true;
-            /**
-             * <p>The value that the Field had at the time it was last focused. This is the value that is passed
-             * to the {@link #change} event which is fired if the value has been changed when the Field is blurred.</p>
-             * <p><b>This will be undefined until the Field has been visited.</b> Compare {@link #originalValue}.</p>
-             * @type mixed
-             * @property startValue
-             */
-            this.startValue = this.getValue();
-            this.fireEvent('focus', e);
-        }
-        
-    },
-
-    // @private
-    beforeBlur: Ext.emptyFn,
-
-    // @private
-    onBlur: function(e) {
-        this.beforeBlur();
-
-        if (this.focusCls) {
-            this.el.removeCls(this.focusCls);
-        }
-
-        this.isFocused = false;
-
-        var v = this.getValue();
-
-        if (String(v) != String(this.startValue)){
-            this.fireEvent('change', this, v, this.startValue);
-        }
-
-        this.fireEvent('blur', e);
-        this.checkClear();
-        this.showMask();
-        this.postBlur();
-    },
-
-    // @private
-    postBlur: Ext.emptyFn,
-
     /**
-     * Returns the normalized data value (undefined or emptyText will be returned as '').  To return the raw value see {@link #getRawValue}.
+     * Returns the field data value
      * @return {Mixed} value The field value
      */
     getValue: function(){
         if (!this.rendered || !this.fieldEl) {
             return this.value;
         }
+        
         return this.fieldEl.getValue();
-    },
-    
-    /**
-     * Attempts to set the field as the active input focus.
-     * @return {Ext.form.Field} this
-     */
-    focus: function(){
-        if (this.rendered && this.fieldEl && this.fieldEl.dom.focus) {
-            this.fieldEl.dom.focus();
-        }
-         
-        return this;
-    },
-    
-    /**
-     * Attempts to forcefully blur input focus for the field.
-     * @return {Ext.form.Field} this
-     */
-    blur: function(){
-        if(this.rendered && this.fieldEl && this.fieldEl.dom.blur) {
-            this.fieldEl.dom.blur();
-        }
-        return this;
     },
 
     /**
-     * Sets a data value into the field and validates it.  To set the value directly without validation see {@link #setRawValue}.
+     * Set the field data value
      * @param {Mixed} value The value to set
      * @return {Ext.form.Field} this
      */
-    setValue: function(v){
-        this.value = v;
+    setValue: function(value){
+        this.value = value;
 
         if (this.rendered && this.fieldEl) {
-            this.fieldEl.dom.value = (Ext.isEmpty(v) ? '': v);
+            this.fieldEl.dom.value = (Ext.isEmpty(value) ? '' : value);
         }
 
-        this.checkClear();
-        
         return this;
     }
 });

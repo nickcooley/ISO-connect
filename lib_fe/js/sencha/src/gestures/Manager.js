@@ -20,13 +20,16 @@ Ext.gesture.Manager = new Ext.AbstractManager({
         
         document.addEventListener(this.startEvent, Ext.createDelegate(this.onTouchStart, this), true);
         document.addEventListener(this.endEvent, Ext.createDelegate(this.onTouchEnd, this), true);
-        document.addEventListener('click', Ext.createDelegate(this.onClick, this), true);
 
-        this.addEventListener(Ext.getBody(), 'tap', Ext.emptyFn, {capture: true, fireClickEvent: true});
-        
-        if (Ext.is.Blackberry) {
-            document.addEventListener('mousedown', this.onMouseDown, false);
+        if (!Ext.is.Desktop) {
+            document.addEventListener('click', Ext.createDelegate(this.onClick, this), true);
+            this.addEventListener(Ext.getBody(), 'tap', Ext.emptyFn, {capture: true, fireClickEvent: true});
         }
+
+        // Not sure if it's even needed
+//        if (Ext.is.Blackberry) {
+//            document.addEventListener('mousedown', this.onMouseDown, false);
+//        }
     },
 
     onClick: function(e) {

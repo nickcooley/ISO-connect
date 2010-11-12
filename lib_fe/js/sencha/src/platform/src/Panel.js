@@ -217,7 +217,7 @@ var panel = new Ext.Panel({
             item.destroy();
         }
 
-        if (hasLayout) {
+        if (hasLayout && !autoDestroy) {
             layout.afterRemove(item);
         }
         this.doComponentLayout();

@@ -1,8 +1,9 @@
 /**
  * @class Ext.is
- * @singleton
- *
+ * 
  * Determines information about the current platform the application is running on.
+ * 
+ * @singleton
  */
 Ext.is = {
     init : function() {
@@ -16,42 +17,44 @@ Ext.is = {
         }
 
         /**
-         * @property Desktop
+         * @property Desktop True if the browser is running on a desktop machine
          * @type {Boolean}
          */
         this.Desktop = this.Mac || this.Windows || (this.Linux && !this.Android);
         /**
-         * @property Tablet
+         * @property Tablet True if the browser is running on a tablet (iPad)
          */
         this.Tablet = this.iPad;
         /**
-         * @property Phone
+         * @property Phone True if the browser is running on a phone.
          * @type {Boolean}
          */
         this.Phone = !this.Desktop && !this.Tablet;
         /**
-         * @property iOS
+         * @property iOS True if the browser is running on iOS
          * @type {Boolean}
          */
         this.iOS = this.iPhone || this.iPad || this.iPod;
         
         /**
-         * @property Standalone
+         * @property Standalone Detects when application has been saved to homescreen.
          * @type {Boolean}
-         * Detects when application has been saved to homescreen.
          */
         this.Standalone = !!window.navigator.standalone;
     },
+    
     /**
-     * @property iPhone
+     * @property iPhone True when the browser is running on a iPhone
+     * @type {Boolean}
      */
     platforms: [{
         string: navigator.platform,
         regex: /iPhone/i,
         identity: 'iPhone'
     },
+    
     /**
-     * @property iPod
+     * @property iPod True when the browser is running on a iPod
      * @type {Boolean}
      */
     {
@@ -59,8 +62,9 @@ Ext.is = {
         regex: /iPod/i,
         identity: 'iPod'
     },
+    
     /**
-     * @property iPad
+     * @property iPad True when the browser is running on a iPad
      * @type {Boolean}
      */
     {
@@ -68,8 +72,9 @@ Ext.is = {
         regex: /iPad/i,
         identity: 'iPad'
     },
+    
     /**
-     * @property Blackberry
+     * @property Blackberry True when the browser is running on a Blackberry
      * @type {Boolean}
      */
     {
@@ -77,8 +82,9 @@ Ext.is = {
         regex: /Blackberry/i,
         identity: 'Blackberry'
     },
+    
     /**
-     * @property Android
+     * @property Android True when the browser is running on an Android device
      * @type {Boolean}
      */
     {
@@ -86,8 +92,9 @@ Ext.is = {
         regex: /Android/i,
         identity: 'Android'
     },
+    
     /**
-     * @property Mac
+     * @property Mac True when the browser is running on a Mac
      * @type {Boolean}
      */
     {
@@ -95,8 +102,9 @@ Ext.is = {
         regex: /Mac/i,
         identity: 'Mac'
     },
+    
     /**
-     * @property Windows
+     * @property Windows True when the browser is running on Windows
      * @type {Boolean}
      */
     {
@@ -104,8 +112,9 @@ Ext.is = {
         regex: /Win/i,
         identity: 'Windows'
     },
+    
     /**
-     * @property Linux
+     * @property Linux True when the browser is running on Linux
      * @type {Boolean}
      */
     {
@@ -119,9 +128,10 @@ Ext.is.init();
 
 /**
  * @class Ext.supports
- * @singleton
  *
  * Determines information about features are supported in the current environment
+ * 
+ * @singleton
  */
 Ext.supports = {
     init : function() {
@@ -149,14 +159,14 @@ Ext.supports = {
     },
 
     /**
-     * @property OrientationChange
+     * @property OrientationChange True if the device supports orientation change
      * @type {Boolean}
      */
     OrientationChange: !Ext.is.Desktop && (((typeof window.orientation != 'undefined') || window.hasOwnProperty('orientation')) && ('onorientationchange' in window)),
 
     tests: [
         /**
-         * @property CSS3 Transitions
+         * @property Transitions True if the device supports CSS3 Transitions
          * @type {Boolean}
          */
         {
@@ -194,7 +204,7 @@ Ext.supports = {
         },
         
         /**
-         * @property Touch
+         * @property Touch True if the device supports touch 
          * @type {Boolean}
          */
         {
@@ -205,7 +215,7 @@ Ext.supports = {
         },
         
         /**
-         * @property RightMargin
+         * @property RightMargin True if the device supports right margin
          * @type {Boolean}
          */
         {
@@ -217,7 +227,7 @@ Ext.supports = {
         },
         
         /**
-         * @property TransparentColor
+         * @property TransparentColor True if the device supports transparent color
          * @type {Boolean}
          */
         {
@@ -229,7 +239,7 @@ Ext.supports = {
         },
         
         /**
-         * @property SVG Support
+         * @property SVG True if the device supports SVG
          * @type {Boolean}
          */
         {
@@ -240,7 +250,7 @@ Ext.supports = {
         },
     
         /**
-         * @property Canvas Support
+         * @property Canvas True if the device supports Canvas
          * @type {Boolean}
          */
         {
@@ -251,7 +261,7 @@ Ext.supports = {
         },
         
         /**
-         * @property VML Support
+         * @property VML True if the device supports VML
          * @type {Boolean}
          */
         {
@@ -264,7 +274,7 @@ Ext.supports = {
         },
         
         /**
-         * @property Float
+         * @property Float True if the device supports CSS float
          * @type {Boolean}
          */
         {
@@ -275,7 +285,7 @@ Ext.supports = {
         },
         
         /**
-         * @property AudioTag
+         * @property AudioTag True if the device supports the HTML5 audio tag
          * @type {Boolean}
          */
         {
@@ -286,7 +296,7 @@ Ext.supports = {
         },
         
         /**
-         * @property History
+         * @property History True if the device supports HTML5 history
          * @type {Boolean}
          */
         {
@@ -297,7 +307,7 @@ Ext.supports = {
         },
         
         /**
-         * @property CSS3DTransform
+         * @property CSS3DTransform True if the device supports CSS3DTransform
          * @type {Boolean}
          */
         {
@@ -307,6 +317,10 @@ Ext.supports = {
             }
         },
         
+        /**
+         * @property GeoLocation True if the device supports GeoLocation
+         * @type {Boolean}
+         */
         {
             identity: 'GeoLocation',
             fn: function() {

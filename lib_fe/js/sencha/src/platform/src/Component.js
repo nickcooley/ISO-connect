@@ -119,7 +119,7 @@ Ext.lib.Component = Ext.extend(Ext.util.Observable, {
             width: 400, height: 300,
             layout: 'form',
             items: [{
-                xtype: 'textarea',
+                xtype: 'textareafield',
                 style: {
                     width: '95%',
                     marginBottom: '10px'
@@ -842,10 +842,10 @@ Ext.lib.Component = Ext.extend(Ext.util.Observable, {
      * <p>For a list of all available xtypes, see the {@link Ext.Component} header.</p>
      * <p>Example usage:</p>
      * <pre><code>
-var t = new Ext.form.TextField();
+var t = new Ext.form.Text();
 var isText = t.isXType('textfield');        // true
-var isBoxSubclass = t.isXType('box');       // true, descended from BoxComponent
-var isBoxInstance = t.isXType('box', true); // false, not a direct BoxComponent instance
+var isBoxSubclass = t.isXType('field');       // true, descended from Ext.form.Field
+var isBoxInstance = t.isXType('field', true); // false, not a direct Ext.form.Field instance
 </code></pre>
      * @param {String} xtype The xtype to check for this Component
      * @param {Boolean} shallow (optional) False to check whether this Component is descended from the xtype (this is
@@ -872,8 +872,8 @@ var isBoxInstance = t.isXType('box', true); // false, not a direct BoxComponent 
      * to participate in determination of inherited xtypes.</b></p>
      * <p>Example usage:</p>
      * <pre><code>
-var t = new Ext.form.TextField();
-alert(t.getXTypes());  // alerts 'component/box/field/textfield'
+var t = new Ext.form.Text();
+alert(t.getXTypes());  // alerts 'component/field/textfield'
 </code></pre>
      * @return {String} The xtype hierarchy string
      */

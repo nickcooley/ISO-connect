@@ -29,8 +29,6 @@ Ext.data.Connection = Ext.extend(Ext.util.Observable, {
     useDefaultXhrHeader : true,
     defaultXhrHeader : 'XMLHttpRequest',
 
-    requests: {},
-
     constructor : function(config) {
         config = config || {};
         Ext.apply(this, config);
@@ -66,7 +64,7 @@ Ext.data.Connection = Ext.extend(Ext.util.Observable, {
              */
             'requestexception'
         );
-
+        this.requests = {};
         Ext.data.Connection.superclass.constructor.call(this);
     },
 

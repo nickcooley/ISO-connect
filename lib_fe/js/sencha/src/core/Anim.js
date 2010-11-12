@@ -1,75 +1,91 @@
 /**
  * @class Ext.Anim
  * @extends Object
- *
- * Defines a type of Animation to be used for transitions.
+ * <p>Ext.Anim is used to excute animations defined in {@link Ext.anims}. The {@link #run} method can take any of the 
+ * properties defined below.</p>
+ * 
+ * <h2>Example usage:</h2>
+ * <code><pre>
+Ext.Anim.run(this, 'fade', {
+    out: false,
+    autoClear: true
+});
+ * </pre></code>
+ * 
+ * <p>Animations are disabled on Android and Blackberry by default using the {@link #disableAnimations} property.</p>
+ * @singleton
  */
 Ext.Anim = Ext.extend(Object, {
     isAnim: true,
-    disableAnimations: (Ext.is.Android || Ext.is.Blackberry) ? true : false,
+    
+    /**
+     * @cfg {Boolean} disableAnimations
+     * True to disable animations. By default, animations are disabled on Android and Blackberry
+     */
+    disableAnimations: false,
+//    disableAnimations: (Ext.is.Android || Ext.is.Blackberry) ? true : false,
 
     defaultConfig: {
         /**
          * @cfg {Object} from
+         * An object of CSS values which the animation begins with. If you define a CSS property here, you must also 
+         * define it in the {@link #to} config.
          */
         from: {},
 
         /**
          * @cfg {Object} to
+         * An object of CSS values which the animation ends with. If you define a CSS property here, you must also 
+         * define it in the {@link #from} config.
          */
         to: {},
 
         /**
          * @cfg {Number} duration
-         * Time in milliseconds for the animation to last. Defaults to 250.
+         * Time in milliseconds for the animation to last. 
+         * (Defaults to 250).
          */
         duration: 250,
 
         /**
-         * @cfg {Number} delay Time to delay before starting the animation. Defaults to 0.
+         * @cfg {Number} delay Time to delay before starting the animation. 
+         * (Defaults to 0).
          */
         delay: 0,
 
         /**
          * @cfg {String} easing
-         * Valid values are 'ease', 'linear', ease-in', 'ease-out', 'ease-in-out' or a cubic-bezier curve as defined by CSS
-         * Defaults to 'ease-in-out'
+         * Valid values are 'ease', 'linear', ease-in', 'ease-out', 'ease-in-out' or a cubic-bezier curve as defined by CSS. 
+         * (Defaults to 'ease-in-out').
          */
         easing: 'ease-in-out',
 
         /**
          * @cfg {Boolean} autoClear
-         * Defaults to true.
+         * True to remove all custom CSS defined in the {@link #to} config when the animation is over. 
+         * (Defaults to true).
          */
         autoClear: true,
 
         /**
-         * @cfg {Boolean} autoReset
-         * Defaults to false
-         */
-        autoReset: false,
-
-        /**
-         * @cfg {Boolean} autoShow
-         * Defaults to true.
-         */
-        autoShow: true,
-
-        /**
          * @cfg {Boolean} out
-         * Defaults to true
+         * True if you want the animation to slide out of the screen. 
+         * (Defaults to true).
          */
         out: true,
 
         /**
          * @cfg {String} direction
-         * Valid values are 'left', 'right', 'up', 'down' and null. Defaults to null.
+         * Valid values are 'left', 'right', 'up', 'down' and null. 
+         * (Defaults to null).
          */
         direction: null,
 
         /**
          * @cfg {Boolean} reverse
-         * Defaults to false.
+         * True to reverse the animation direction. For example, if the animation direction was set to 'left', it would 
+         * then use 'right'. 
+         * (Defaults to false).
          */
         reverse: false
     },
@@ -81,7 +97,7 @@ Ext.Anim = Ext.extend(Object, {
 
     /**
      * @cfg {Scope} scope
-     * Scope to run the before function in.
+     * Scope to run the {@link before} function in.
      */
 
     opposites: {
@@ -121,7 +137,7 @@ Ext.Anim = Ext.extend(Object, {
 
         return config;
     },
-
+    
     run: function(el, config) {
         el = Ext.get(el);
         config = config || {};
@@ -236,6 +252,13 @@ Ext.Anim = Ext.extend(Object, {
 
 Ext.Anim.seed = 1000;
 
+/**
+ * Used to run an animation on a specific element. Use the config argument to customize the animation
+ * @param {Ext.Element/Element} el The element to animate
+ * @param {String} anim The animation type, defined in {@link #Ext.anims}
+ * @param {Object} config The config object for the animation
+ * @method run
+ */
 Ext.Anim.run = function(el, anim, config) {
     if (el.isComponent) {
         el = el.el;
@@ -262,7 +285,7 @@ Ext.Anim.run = function(el, anim, config) {
             throw anim + ' is not a valid animation type.';
         }
         else {
-            // addl check to make sure dom exists.
+            // add el check to make sure dom exists.
             if (el && el.dom) {
                 Ext.anims[anim].run(el, config);
             }
@@ -273,10 +296,9 @@ Ext.Anim.run = function(el, anim, config) {
 
 /**
  * @class Ext.anims
+ * <p>Defines different types of animations. <strong>flip, cube, wipe</strong> animations do not work on Android.</p>
+ * <p>Please refer to {@link Ext.Anim} on how to use animations.</p>
  * @singleton
- *
- * Contains a collection of predefined Ext.Anim's to be used between
- * transitions.
  */
 Ext.anims = {
     /**

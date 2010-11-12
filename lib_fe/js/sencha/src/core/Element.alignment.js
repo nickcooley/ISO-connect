@@ -54,7 +54,7 @@ Ext.Element.addMethods({
 
         //<debug>
         if (!el || !el.dom) {
-            throw "Element.alignToXY with an element that doesn't exist";
+            throw new Error("Element.alignToXY with an element that doesn't exist");
         }
         //</debug>
         offsets = offsets || [0, 0];

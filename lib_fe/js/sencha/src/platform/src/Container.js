@@ -26,7 +26,6 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
      * <pre><code>
 layout: {
     type: 'vbox',
-    padding: '5',
     align: 'left'
 }
        </code></pre>
@@ -467,7 +466,7 @@ tb.{@link #doLayout}();             // refresh the layout
         if (this.fireEvent('beforeadd', this, cmp, index) !== false && this.onBeforeAdd(cmp) !== false) {
             this.items.insert(index, cmp);
             cmp.onAdded(this, index);
-            this.onAdd(cmp);
+            this.onAdd(cmp, index);
             this.fireEvent('add', this, cmp, index);
         }
 
@@ -520,6 +519,11 @@ tb.{@link #doLayout}();             // refresh the layout
      */
     remove : function(comp, autoDestroy) {
         var c = this.getComponent(comp);
+        //<debug>
+			if (!c) {
+            	console.warn("Attempted to remove a component that does not exist. Ext.Container: remove takes an argument of the component to remove. cmp.remove() is incorrect usage.");				
+			}
+        //</debug>
         
         if (c && this.fireEvent('beforeremove', this, c) !== false) {
             this.doRemove(c, autoDestroy);
@@ -541,13 +545,13 @@ tb.{@link #doLayout}();             // refresh the layout
             layout.onRemove(component);
         }
         
-        this.onRemove(component);
+        this.onRemove(component, autoDestroy);
 
         if (autoDestroy === true || (autoDestroy !== false && this.autoDestroy)) {
             component.destroy();
         }
 
-        if (hasLayout) {
+        if (hasLayout && !autoDestroy) {
             layout.afterRemove(component);
         }
     },
@@ -651,8 +655,9 @@ tb.{@link #doLayout}();             // refresh the layout
         return this.query(selector)[0] || null;
     },
 
+    // inherit docs
     show : function() {
-        Ext.lib.Container.superclass.show.call(this);
+        Ext.lib.Container.superclass.show.apply(this, arguments);
         
         var layoutCollection = this.layoutOnShow,
             ln = layoutCollection.getCount(),

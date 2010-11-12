@@ -76,7 +76,7 @@ var formBase2 = {
       
       });
         
-      console.log(this.items);
+      
       isobar.twAuthScreen.superclass.initComponent.call(this);
     }
   });

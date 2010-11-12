@@ -5,37 +5,39 @@
  * Simple Checkbox class. Can be used as a direct replacement for traditional checkbox fields.
  * @constructor
  * @param {Object} config Optional config object
- * @xtype checkbox
+ * @xtype checkboxfield
  */
 Ext.form.Checkbox = Ext.extend(Ext.form.Field, {
-    inputType: 'checkbox',
-    
     ui: 'checkbox',
     
-    /**
-     * @cfg {Boolean} showClear @hide
-     */
+    inputType: 'checkbox',
 
     /**
      * @cfg {Boolean} checked <tt>true</tt> if the checkbox should render initially checked (defaults to <tt>false</tt>)
      */
-    checked : false,
+    checked: false,
     
     /**
-     * @cfg {String} inputValue The string value to submit if the item is in a checked state.
+     * @cfg {String} value The string value to submit if the item is in a checked state.
      */
-    inputValue : undefined,
+    value: '',
 
     // @private
     constructor: function(config) {
         this.addEvents(
             /**
              * @event check
-             * Fires when the checkbox is checked or unchecked.
+             * Fires when the checkbox is checked.
              * @param {Ext.form.Checkbox} this This checkbox
-             * @param {Boolean} checked The new checked value
              */
-            'check'
+            'check',
+
+            /**
+             * @event uncheck
+             * Fires when the checkbox is unchecked.
+             * @param {Ext.form.Checkbox} this This checkbox
+             */
+            'uncheck'
         );
 
         Ext.form.Checkbox.superclass.constructor.call(this, config);
@@ -43,88 +45,134 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field, {
     
     renderTpl: [
         '<tpl if="label"><label <tpl if="fieldEl">for="{inputId}"</tpl> class="x-form-label"><span>{label}</span></label></tpl>',
-        '<tpl if="fieldEl"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}" ',
-            '<tpl if="tabIndex">tabIndex="{tabIndex}" </tpl>',
+        '<tpl if="fieldEl"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}" tabIndex="-1" ',
             '<tpl if="checked"> checked </tpl>',
             '<tpl if="style">style="{style}" </tpl> value="{inputValue}" />',
         '</tpl>'
     ],
 
     // @private
-    onRender : function(ct, position) {
-        var me = this;
-        
-        Ext.apply(me.renderData, {
-            inputValue : me.inputValue || me.value || '',
-            checked    : (['true', '1', 'on'].indexOf(me.checked) !== -1)
+    onRender: function() {
+        var isChecked = this.getBooleanIsChecked(this.checked);
+
+        Ext.apply(this.renderData, {
+            inputValue  : this.value || '',
+            checked     : isChecked
         });
 
         Ext.form.Checkbox.superclass.onRender.apply(this, arguments);
 
-        if (me.fieldEl) {
-            me.mon(me.fieldEl, {
-                change: me.onChange,
-                scope: me
+        if (this.fieldEl) {
+            this.mon(this.fieldEl, {
+                change: this.onChange,
+                scope: this
             });
 
-	        me.setValue(me.checked);
+            this.setChecked(isChecked);
+            this.originalState = this.isChecked();
         }
-
     },
     
     // @private
-    onChange : function() {
-        this.fireEvent('check', this, this.getValue());
+    onChange: function() {
+        if (this.isChecked()) {
+            this.fireEvent('check', this);
+        } else {
+            this.fireEvent('uncheck', this);
+        }
     },
 
     /**
      * Returns the checked state of the checkbox.
-     * @return {Boolean} True if checked, else false
+     * @return {Boolean} True if checked, else otherwise
      */
-    getValue : function(){
-        if (this.rendered) {
-            return this.fieldEl.dom.checked || false;
-        }
-        return this.checked || false;
+    isChecked: function() {
+        return this.fieldEl.dom.checked || false;
     },
 
     /**
-     * Sets the checked state of the checkbox and fires the 'check' event.
-     * @param {Boolean/String} checked The following values will check the checkbox:
-     * <code>true, 'true', '1', or 'on'</code>. Any other value will uncheck the checkbox.
+     * Set the checked state of the checkbox.
+     * @return {Ext.form.Checkbox} this This checkbox
      */
-    setValue : function(v) {
-        var checked = this.getValue();
-        
-        this.checked = /^(true|1|on)/i.test(String(v));
-        
-        if (this.rendered) {
-            this.fieldEl.dom.checked = this.fieldEl.dom.defaultChecked = this.checked;
-        }
+    setChecked: function(checked) {
+        this.fieldEl.dom.checked = this.getBooleanIsChecked(checked);
 
-        if (checked != this.checked) {
-            this.onChange();
-        }
+        return this;
     },
 
     /**
-     * Sets the value that will be sent when the form is submitted and this is checked.
-     * @param {String/Number} inputValue The value that this checkbox will sent
-     */    
-    setInputValue : function(inputValue) {
-        this.inputValue = inputValue;
-        if (this.rendered) {
-            this.fieldEl.dom.value = inputValue;
-        }
+     * Set the checked state of the checkbox to true
+     * @return {Ext.form.Checkbox} this This checkbox
+     */
+    check: function() {
+        return this.setChecked(true);
     },
 
     /**
-     * Returns the value that will be sent when the form is submitted and this is checked.
-     * @return {String/Number} inputValue The value that this checkbox will sent if checked
-     */    
-    getInputValue : function() {
-        return this.rendered ? this.fieldEl.dom.value : (this.inputValue || this.value);
+     * Set the checked state of the checkbox to false
+     * @return {Ext.form.Checkbox} this This checkbox
+     */
+    uncheck: function() {
+        return this.setChecked(false);
+    },
+
+    // Inherited
+    reset: function() {
+        Ext.form.Checkbox.superclass.reset.apply(this, arguments);
+        
+        this.setChecked(this.originalState);
+
+        return this;
+    },
+
+    //@private
+    getBooleanIsChecked: function(value) {
+        return /^(true|1|on)/i.test(String(value));
+    },
+
+    getSameGroupFields: function() {
+        var parent = this.el.up('form'),
+            formComponent = Ext.getCmp(parent.id),
+            fields = [];
+
+        if (formComponent) {
+            fields = formComponent.getFields(this.getName());
+        }
+
+        return fields;
+    },
+
+    /**
+     * Returns an array of values from the checkboxes in the group that are checked,
+     * @return {Array}
+     */
+    getGroupValues: function() {
+        var values = [];
+
+        this.getSameGroupFields().forEach(function(field) {
+            if (field.isChecked()) {
+                values.push(field.getValue());
+            }
+        });
+
+        return values;
+    },
+
+    /**
+     * Set the status of all matched checkboxes in the same group to checked
+     * @param {Array} values An array of values
+     * @return {Ext.form.Checkbox} This checkbox
+     */
+    setGroupValues: function(values) {
+        this.getSameGroupFields().forEach(function(field) {
+            field.setChecked((values.indexOf(field.getValue()) !== -1));
+        });
+        
+        return this;
     }
 });
 
+Ext.reg('checkboxfield', Ext.form.Checkbox);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('checkbox', Ext.form.Checkbox);

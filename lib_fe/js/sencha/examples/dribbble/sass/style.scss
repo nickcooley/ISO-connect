@@ -1,0 +1,65 @@
+$active-color: #F32983;
+$base-color: #666;
+
+@import 'sencha-touch/default/all';
+
+@include sencha-panel;
+@include sencha-buttons;
+@include sencha-tabs;
+@include sencha-toolbar;
+@include sencha-carousel;
+@include sencha-indexbar;
+@include sencha-list;
+@include sencha-layout;
+
+.shot {
+    
+    height: auto !important;
+    
+    .teaser {
+        @include border-radius(.2em);
+        max-width: 120px;
+        margin-right: 20px;
+        margin-bottom: 5px;
+        vertical-align: middle;
+    }
+  
+    .avatar {
+        max-width: 40px;
+        @include border-radius(.2em);
+        position: absolute;
+        bottom: 10px;
+        left: 100px;
+    }
+  
+    h1 {
+        font-size: 18px;
+        display: inline;
+        font-weight: bold;
+        span { color: #999; }
+    }
+  
+}
+
+.x-carousel {
+    top: 60px;
+    right: 10px;
+    left: auto !important;
+}
+
+
+.x-floating {
+  padding: 6px;
+  -webkit-border-radius: 8px;
+  -webkit-box-shadow: rgba(0,0,0,.8) 0 2px 10px;
+  @include background-gradient(darken($base-color, 40%), 'glossy');
+
+  &.x-panel-light {
+    @include background-gradient($base-color, 'glossy');    
+  }
+}
+
+.x-carousel-body {
+  background-color: #fff;
+  @include border_radius($panel_border_radius);
+}

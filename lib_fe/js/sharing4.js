@@ -9,6 +9,7 @@ Ext.ns('iso', 'iso.views', 'iso.detailedTweet', 'iso.TweetList', 'iso.TweetFlow'
  * */
 iso.TweetList = Ext.extend(Ext.List, {
   title: 'Tweets',
+  cls: 'tweetList',
   fullscreen: true,
   unlocked: localStorage.getItem('isoConnectUnlocked'),
   itemSelector: '.tweet',
@@ -20,7 +21,7 @@ iso.TweetList = Ext.extend(Ext.List, {
     
     Ext.regModel('Tweet',{fields: ['profile_image_url', 'from_user', 'text', 'created_at']})
     this.store = new Ext.data.JsonStore({model: 'Tweet'});
-    this.tpl = (this.unlocked)?tweetTpl:tweetTplLocked;
+    this.itemTpl = tweetTpl;
     
        
       
@@ -39,20 +40,29 @@ iso.TweetList = Ext.extend(Ext.List, {
   
   },
   tweetSelect: function(dv, index, item, e){
-  	var ds = dv.getStore(),
-  	r = ds.getAt(index),
-  	tid = r.get("id");
+  	if(localStorage.getItem('oAuth')){
+  	  var ds = dv.getStore(),
+      r = ds.getAt(index),
+      tid = r.get("id");
+      
+      
+      _gaq.push(['_trackPageview', "tweets/selectTweet/" + tid]);
+      this.fireEvent('selectTweet', r);
+  	}
+  	else{
+  	  iso.Util.beginOAuth();
+  	}
   	
-  	console.log(r);
-  	_gaq.push(['_trackPageview', "tweets/selectTweet/" + tid]);
-    this.fireEvent('selectTweet', r);
+  	
   },
   refresher: function(){
-    console.log('list refreshed');
+    
     this.updateResults();
   },
   updateResults: function(cid){
-    Ext.getBody().mask(false, '<div class="loading">Loading&hellip;</div>');
+    Ext.getBody().mask('Loading', 'loading', false);
+    this.scroller.scrollTo({x: 0, y: 0});
+    
      
     if(typeof cid == 'number' ){
       this.cid = cid
@@ -64,12 +74,9 @@ iso.TweetList = Ext.extend(Ext.List, {
       cid = 0;
     }
     
-    if(cid == 0 || this.unlocked){
-      this.tpl = tweetTpl;      
-    }
-    else{
-      this.tpl = tweetTplLocked;
-    }
+    
+    this.itemTpl = tweetTpl;      
+    
     var randomnumber=Math.floor(Math.random() * 100000000000);
       
   	Ext.util.JSONP.request({
@@ -85,11 +92,8 @@ iso.TweetList = Ext.extend(Ext.List, {
      callback: function(result){
        
        var tweets = result.tweets;
-       //console.log(tweets);
        if(tweets){
          this.store.loadData(tweets);
-         //this.scroller.scrollTo({x:0, y:0}, true);
-         
          this.fireEvent('updateComplete');
        
        }
@@ -97,8 +101,6 @@ iso.TweetList = Ext.extend(Ext.List, {
          console.log('sorry, no tweets');
        }
        Ext.getBody().unmask();
-        //console.log(obj);
-        //obj.testData();
        }
     
     });
@@ -109,7 +111,7 @@ Ext.ns('isobar.detailedTweet');
 
    
 Ext.regModel('mdlTweet', {
-  fields: ['channel_id', 'id', 'text', 'source', 'created_at_long', 'profile_image_url', 'from_user', 'from_user_id']
+  fields: ['channel_id', 'created_at', 'id', 'text', 'source', 'created_at_long', 'profile_image_url', 'screen_name', 'from_user_id']
 })
 
 
@@ -134,6 +136,14 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
       hidden: !oAuthed,
       centered: true,
       handler: this.processReTweet,
+      scope: this
+    });
+    var fv = new Ext.Button({
+      text: 'Favorite', 
+      cls: 'cta', 
+      hidden: !oAuthed,
+      centered: true,
+      handler: this.processFavorite, 
       scope: this
     })
     var cta = new Ext.Button({
@@ -164,9 +174,6 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
     var authorItems = [this.pnlTwAuthorDe, {
         xtype: 'button',ui: (Ext.is.Phone)?'small':null, text:'Details', flex: 1, handler: this.getAuthorDetail, scope: this, layout: {align:'right'}
       }];
-    
-    
-    
     this.tweetAuthorInfo = new Ext.Panel({
       cls: 'authorDetails',
       layout: {type: 'hbox', height: '100', pack: 'justify'},
@@ -174,55 +181,90 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
       items: authorItems
     });
     
-    //this.updateTwDetail(27878204600);
+    this.buttonArea = new Ext.Panel({
+      align: 'center',
+      layout: {type: 'hbox', width: 'auto'},
+      padding: '10px',
+      items: [rt, cta, fv]
+    })
     
-    var itemsArray = [this.pnlTweet];
+    var itemsArray = [this.pnlTweet, this.buttonArea];
     
-    if(!localStorage.getItem('isoDisplayModel')){
-     itemsArray.push(rt, cta);
-      
-    }
     this.items = itemsArray;
     this.dockedItems = [this.tweetAuthorInfo]
     
     isobar.detailedTweet.superclass.initComponent.call(this);
     this.addEvents('updateComplete', 'needAuthor');
   },
+  processFavorite: function(){
+    Ext.Msg.confirm('Favorite Tweet?', 'Are you sure you want to add this tweet to your favorites?', function(button){
+      if(button == 'yes'){
+           var ds = this.storeTweet,
+            r = ds.getAt(0);
+            r = r.get('id');
+            
+            Ext.util.JSONP.request({
+             url: '/api/favorite.php',
+             params: {
+              "tid": r,
+              "wrap": true
+              
+             },
+             scope: this,
+             callbackKey: 'callback',
+             callback: function(result){
+               
+               if(result.success == true){
+                 _gaq.push(['_trackPageview', "tweets/favorite/" + r]);
+                 var title = "Favorite Success!"
+                 var msg = "You have successfully added this tweet to your favorites." 
+               }
+               else{
+                 var title = "Favorite Error"
+                 var msg = "There was a problem with your this operation.  Please try again later." 
+               }
+               
+               Ext.Msg.alert(title, msg);                      
+             }
+             });           
+      }           
+    },this)    
+  },
   processReTweet:function(){
-    //console.log(this.storeTweet.data.get(0));
-    
-    Ext.Msg.confirm('Retweet?', 'Are you sure you want to retweet this item?', function(){
-      var ds = this.storeTweet,
-      r = ds.getAt(0);
-      
-      
-      
-      
-      Ext.util.JSONP.request({
-       url: '/api/retweet.php',
-       params: {
-        "tid": r,
-        "wrap": true
+    Ext.Msg.confirm('Retweet?', 'Are you sure you want to retweet this item?', function(button){      
+      if(button == 'yes'){
+        var ds = this.storeTweet,
+        r = ds.getAt(0);
+        r = r.get('id');     
         
-       },
-       scope: this,
-       callbackKey: 'callback',
-       callback: function(result){
-         console.log(result)
-         if(result.success == true){
-           _gaq.push(['_trackPageview', "tweets/retweet/" + r]);
-           var title = "Retweet Success!"
-           var msg = "You have successfully retweeted this item." 
+        
+        
+        Ext.util.JSONP.request({
+         url: '/api/retweet.php',
+         params: {
+          "tid": r,
+          "wrap": true
+          
+         },
+         scope: this,
+         callbackKey: 'callback',
+         callback: function(result){
+           
+           if(result.success == true){
+             _gaq.push(['_trackPageview', "tweets/retweet/" + r]);
+             var title = "Retweet Success!"
+             var msg = "You have successfully retweeted this item." 
+           }
+           else{
+             var title = "Retweet Error"
+             var msg = "There was a problem with your retweet.  Please try again later." 
+           }
+           
+           Ext.Msg.alert(title, msg);
+                  
          }
-         else{
-           var title = "Retweet Error"
-           var msg = "There was a problem with your retweet.  Please try again later." 
-         }
-         
-         Ext.Msg.alert(title, msg);
-                
+         });
        }
-       });
       
     }, this)
     
@@ -231,16 +273,16 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
   },
   getAuthorDetail: function(){
    var ds = this.storeTweet;
-   console.log(ds);
-   r = ds.getAt(1);
    
-   console.log(r);
+   r = ds.getAt(0);
+   r = r.get('screen_name');
+   
+   
    this.fireEvent('needAuthor',r);
   },
   updateTwDetail: function(record){
-    console.log(record.data);
-    
     var r = record.data
+    
     
     if(r.parsed == undefined){
       r.text = this.handleLinks(r.text);
@@ -248,20 +290,19 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
       r.parsed = true;    
     }
     
-    this.storeTweet.loadData(record.data);
+    this.storeTweet.removeAt(0);
+    this.storeTweet.add([record.data]);
     this.pnlTweet.update(record.data);
     this.pnlTwAuthorDe.update(record.data);
    
-    this.pnlTwAuthorDe.doLayout();
+    //this.pnlTwAuthorDe.doLayout();
     this.fireEvent('updateComplete');
     
   },
   reEncodeLinks: function(text){
-     console.log(text);
      text = text.replace(/&gt;/gi, '>');
      text = text.replace(/&lt;/gi, '<');
      text = text.replace(/&quot;/gi, '"');
-     console.log(text)
      return text;
   },
   handleLinks: function(text){
@@ -269,22 +310,14 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
         var comps = text.split(' ');
         var regEx = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
         
-        console.log(comps);
-        
         for(i=0; i<comps.length; i++){
-        	console.log(comps[i] + ' ' + comps[i])
-          if(regEx.test(comps[i]) && comps[i].indexOf("<a href='") == -1){
-            console.log(comps[i]);
+        	if(regEx.test(comps[i]) && comps[i].indexOf("<a href='") == -1){
             comps[i] = makeLink(comps[i]);
           }
-        }
-        
+        }        
         return comps.join(' ');
-        
-        //console.log(regExt.test(text));
         function makeLink(link){
-          
-        	return ("<a href='" + link + "' target='_new'>" + link + "</a>");
+          return ("<a href='" + link + "' target='_new'>" + link + "</a>");
         }
       }  
 });
@@ -325,8 +358,8 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
       	centered: false,
       	hideOnMaskTap: true, 
       	data: null, 
-      	arrive: 'right',
-      	depart: 'right',
+      	enter: 'right',
+      	exit: 'right',
       	width: 400,
       	style: {
       	 background: '#fff',
@@ -334,8 +367,7 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
       	},
       	listeners: {
       	 hide: function(){
-      	   console.log('deactivate')
-      	   this.detailPanel.setCard(0); 
+      	   this.detailPanel.setActiveItem(0); 
       	 },
       	 scope: this
       	},
@@ -348,7 +380,7 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
     
     this.detailedTweet.on('updateComplete', function(){
       if(Ext.is.Phone){
-        this.setCard(1, 'slide');
+        this.setActiveItem(1, 'slide');
       }
       else{
         this.detailSheet.show();
@@ -358,7 +390,7 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
    
     this.items = itemsAr;
     
-    //this.setCard(1);
+    //this.setActiveItem(1);
     
     iso.TweetFlow.superclass.initComponent.call(this);
     this.addEvents('updateComplete')
@@ -366,26 +398,22 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
     this.tweetList.on('selectTweet', this.detailTweet, this);
     this.detailedTweet.on('needAuthor', this.giveAuthor, this);
   },
-  giveAuthor: function(id){
-    console.log('author in question is ' + id);
+  giveAuthor: function(id){    
     this.authorDetail.updateAuthor(id);
     this.authorDetail.on('updateComplete', function(){
       
     if(Ext.is.Phone){  
-      this.setCard(2, 'slide')
+      this.setActiveItem(2, 'slide')
     }
     else{
-      this.detailPanel.setCard(1, 'slide');
+      this.detailPanel.setActiveItem(1, 'slide');
     }
     
     }, this);
     
   },
   detailTweet: function(record){
-    console.log(record);
     this.detailedTweet.updateTwDetail(record);
-    
-    
   },
   updateTweet: function(dv, index, item, e){
     
@@ -393,29 +421,9 @@ iso.TweetFlow = Ext.extend(Ext.Panel, {
   updateComplete: function(){
     this.fireEvent('updateComplete');
   },
-  updateResults: function(cid){
-    console.log(cid);
+  updateResults: function(cid){  
     this.tweetList.updateResults(cid);
   }
 });
 
 
-
-
-/*
-
-Ext.setup({
-  tabletStartupScreen: 'lib/img/tabletStartScreen.png' ,
-  phoneStartupScreen: 'lib/img/phoneStartScreen.png' ,
-  icon: 'lib/img/iconMobile.gif',
-  glossOnIcon: true,
-  onReady: function(){
-  
-  var tl = new iso.TweetFlow({});  	 	
-
-    
-  	
-  }
-}); */
-
-//Ext.reg('iso.tweetList', isobar.Tweetlist);

@@ -16,6 +16,8 @@ if (isset($_REQUEST['oauth_token']) && $_SESSION['oauth_token'] !== $_REQUEST['o
 	header('Location: ./clearsessions.php');
 }
 
+error_log("HITTING THE CALLBACK");
+
 // Create TwitteroAuth object with app key/secret and token key/secret from default phase
 $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
 
@@ -33,7 +35,7 @@ unset($_SESSION['oauth_token_secret']);
 if (200 == $connection->http_code) {
 	// The user has been verified and the access tokens can be saved for future use
 	$_SESSION['status'] = 'verified';
-	header('Location: /master.php');
+	header('Location: /');
 } 
 else {
 	// Save HTTP status for error dialog on connnect page

@@ -2,23 +2,94 @@
  * @class Ext.Button
  * @extends Ext.Component
  *
- * A simple button class
+ * <p>A simple class to display different styles of buttons.</p>
  *
- * <pre><code>
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #ui} (defines the style of the button)</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #handler} (method to be called when the button is tapped)</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Button/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
+<pre><code>
+// an array of buttons (using xtypes) to be included in the panel below
 var buttons = [
-    {text: 'Back', ui: 'back', handler: tapMe},
-    {text: 'Default', handler: tapMe},
-    {text: 'Round', ui: 'round', handler: tapMe},
-    {xtype: 'spacer'},
-    {text: 'Action', ui: 'action', handler: tapMe},
-    {text: 'Forward', ui: 'forward', handler: tapMe}
+    {
+        text: 'Normal'
+    },
+    {
+        ui  : 'round',
+        text: 'Round'
+    },
+    {
+        ui  : 'small',
+        text: 'Small'
+    }
 ];
 
-var toolbar1 = new Ext.Toolbar({
-    dock: 'top',
-    title: 'Toolbar',
-    items: buttons
-});</code></pre>
+var panel = new Ext.Panel({
+    layout: {
+        type : 'vbox',
+        pack : 'center',
+        align: 'stretch'
+    },
+    defaults: {
+        layout: {
+            type: 'hbox'
+        },
+        flex: 1,
+        defaults: {
+            xtype: 'button',
+            cls  : 'demobtn',
+            flex : 1
+        }
+    },
+    items: [
+        {
+            items: buttons // buttons array defined above
+        },
+        {
+            items: [
+                new Ext.Button({
+                    ui  : 'decline',
+                    text: 'Drastic'
+                }),
+                {
+                    ui  : 'decline-round',
+                    text: 'Round'
+                },
+                {
+                    ui  : 'decline-small',
+                    text: 'Small'
+                }
+            ]
+        },
+        {
+            items: [
+                {
+                    ui  : 'confirm',
+                    text: 'Confirm'
+                },
+                {
+                    ui  : 'confirm-round',
+                    text: 'Round'
+                },
+                {
+                    ui  : 'confirm-small',
+                    text: 'Small'
+                }
+            ]
+        }
+    ]
+});
+</code></pre>
  */
 
 /**

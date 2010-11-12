@@ -143,7 +143,7 @@ Ext.layout.BoxLayout = Ext.extend(Ext.layout.ContainerLayout, {
  * This layout may also be used to set the heights of child items by configuring it with the {@link #align} option.
  */
 Ext.layout.HBoxLayout = Ext.extend(Ext.layout.BoxLayout, {
-    orientation: 'horizontal',
+    orientation: 'horizontal'
     
     /**
      * @cfg {String} pack

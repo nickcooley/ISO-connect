@@ -3,7 +3,7 @@
  * @class Ext.data.Batch
  * @extends Ext.util.Observable
  * 
- * <p>Provides a mechanism to run one or more {@link Ext.data.Operation operations} in a given order. Fires the 'operation-complete' event
+ * <p>Provides a mechanism to run one or more {@link Ext.data.Operation operations} in a given order. Fires the 'operationcomplete' event
  * after the completion of each Operation, and the 'complete' event when all Operations have been successfully executed. Fires an 'exception'
  * event if any of the Operations encounter an exception.</p>
  * 
@@ -81,11 +81,14 @@ Ext.data.Batch = Ext.extend(Ext.util.Observable, {
           'exception',
           
           /**
-           * @event operation-complete
+           * @event operationcomplete
            * Fired when each operation of the batch completes
            * @param {Ext.data.Batch} batch The batch object
            * @param {Object} operation The operation that just completed
            */
+          'operationcomplete',
+          
+          //TODO: Remove this once we deprecate this function in 1.0. See below for further details
           'operation-complete'
         );
         
@@ -159,7 +162,11 @@ Ext.data.Batch = Ext.extend(Ext.util.Observable, {
                     this.hasException = true;
                     this.fireEvent('exception', this, operation);
                 } else {
+                    //TODO: deprecate the dashed version of this event name 'operation-complete' as it breaks convention
+                    //to be removed in 1.0
                     this.fireEvent('operation-complete', this, operation);
+                    
+                    this.fireEvent('operationcomplete', this, operation);
                 }
 
                 if (hasException && this.pauseOnException) {

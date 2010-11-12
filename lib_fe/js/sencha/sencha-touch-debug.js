@@ -3406,12 +3406,12 @@ Ext.LoadMask = Ext.extend(Ext.util.Observable, {
     },
 
     
-    disable : function(){
+    disable : function() {
        this.disabled = true;
     },
 
     
-    enable : function(){
+    enable : function() {
         this.disabled = false;
     },
 
@@ -3421,7 +3421,7 @@ Ext.LoadMask = Ext.extend(Ext.util.Observable, {
     },
     
     
-    onLoad : function(){
+    onLoad : function() {
         this.el.unmask();
         this.fireEvent('hide', this, this.el, this.store);
     },
@@ -3905,7 +3905,7 @@ Ext.EventManager = {
             if (!cache.hasOwnProperty(ev)) {
                 continue;
             }
-            this.removeListener(ev);
+            this.removeListener(dom, ev);
         }
         Ext.cache[dom.id].events = {};
     },
@@ -4288,11 +4288,13 @@ Ext.is = {
         this.Standalone = !!window.navigator.standalone;
     },
     
+    
     platforms: [{
         string: navigator.platform,
         regex: /iPhone/i,
         identity: 'iPhone'
     },
+    
     
     {
         string: navigator.platform,
@@ -4300,11 +4302,13 @@ Ext.is = {
         identity: 'iPod'
     },
     
+    
     {
         string: navigator.userAgent,
         regex: /iPad/i,
         identity: 'iPad'
     },
+    
     
     {
         string: navigator.userAgent,
@@ -4312,11 +4316,13 @@ Ext.is = {
         identity: 'Blackberry'
     },
     
+    
     {
         string: navigator.userAgent,
         regex: /Android/i,
         identity: 'Android'
     },
+    
     
     {
         string: navigator.platform,
@@ -4324,11 +4330,13 @@ Ext.is = {
         identity: 'Mac'
     },
     
+    
     {
         string: navigator.platform,
         regex: /Win/i,
         identity: 'Windows'
     },
+    
     
     {
         string: navigator.platform,
@@ -4488,6 +4496,7 @@ Ext.supports = {
             }
         },
         
+        
         {
             identity: 'GeoLocation',
             fn: function() {
@@ -4527,6 +4536,9 @@ Ext.data.Batch = Ext.extend(Ext.util.Observable, {
           
           
           'exception',
+          
+          
+          'operationcomplete',
           
           
           'operation-complete'
@@ -4584,7 +4596,11 @@ Ext.data.Batch = Ext.extend(Ext.util.Observable, {
                     this.hasException = true;
                     this.fireEvent('exception', this, operation);
                 } else {
+                    
+                    
                     this.fireEvent('operation-complete', this, operation);
+                    
+                    this.fireEvent('operationcomplete', this, operation);
                 }
 
                 if (hasException && this.pauseOnException) {
@@ -6253,7 +6269,7 @@ Ext.data.AbstractStore = Ext.extend(Ext.util.Observable, {
         };
 
         if (this.batchUpdateMode == 'operation') {
-            listeners['operation-complete'] = this.onBatchOperationComplete;
+            listeners['operationcomplete'] = this.onBatchOperationComplete;
         } else {
             listeners['complete'] = this.onBatchComplete;
         }
@@ -6416,9 +6432,9 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
             this.sort();
             delete this.inlineData;
         } else if (this.autoLoad) {
+            Ext.defer(this.load, 10, this, [typeof this.autoLoad == 'object' ? this.autoLoad : undefined]);
             
             
-            this.load(typeof this.autoLoad == 'object' ? this.autoLoad : undefined);
         }
     },
 
@@ -6472,10 +6488,11 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
 
         records = [].concat(records);
         for (i = 0, len = records.length; i < len; i++) {
-            records[i].set(this.modelDefaults);
+            record = this.createModel(records[i]);
+            record.set(this.modelDefaults);
 
-            this.data.insert(index + i, records[i]);
-            records[i].join(this);
+            this.data.insert(index + i, record);
+            record.join(this);
         }
 
         if (this.snapshot) {
@@ -6487,17 +6504,17 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
     },
 
     
-    add: function() {
-        var records = Array.prototype.slice.apply(arguments),
-            length  = records.length,
+    add: function(records) {
+        
+        if (!Ext.isArray(records)) {
+            records = Array.prototype.slice.apply(arguments);
+        }
+        
+        var length  = records.length,
             record, i;
 
         for (i = 0; i < length; i++) {
-            record = records[i];
-            
-            if (!(record instanceof Ext.data.Model)) {
-                record = Ext.ModelMgr.create(record, this.model);
-            }
+            record = this.createModel(records[i]);
 
             if (record.phantom == false) {
                 record.needsAdd = true;
@@ -6509,6 +6526,14 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
         this.insert(this.data.length, records);
 
         return records;
+    },
+
+    
+    createModel: function(record){
+        if (!(record instanceof Ext.data.Model)) {
+            record = Ext.ModelMgr.create(record, this.model);
+        }
+        return record;
     },
 
     
@@ -6952,6 +6977,7 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
         }
     }
 });
+
 
 Ext.data.TreeStore = Ext.extend(Ext.data.AbstractStore, {
     
@@ -10866,8 +10892,11 @@ Ext.applyIf(Ext.Element, {
     
     fromPoint: function(x, y) {
         return Ext.get(document.elementFromPoint(x, y));
-    },
+    }
+});
 
+Ext.applyIf(Ext.Element, {
+    
     
     getComputedTransformOffset: function(el) {
         if (el instanceof Ext.Element)
@@ -11186,7 +11215,7 @@ Ext.Element.addMethods({
         },
         
         addClass : function() {
-            throw "Component: addClass has been deprecated. Please use addCls.";
+            throw new Error("Component: addClass has been deprecated. Please use addCls.");
         },
 
         
@@ -11218,7 +11247,7 @@ Ext.Element.addMethods({
         },
         
         removeClass : function() {
-            throw "Component: removeClass has been deprecated. Please use removeCls.";
+            throw new Error("Component: removeClass has been deprecated. Please use removeCls.");
         },
 
         
@@ -11308,7 +11337,7 @@ Ext.Element.addMethods({
         },
         
         radioClass : function() {
-            throw "Component: radioClass has been deprecated. Please use radioCls.";
+            throw new Error("Component: radioClass has been deprecated. Please use radioCls.");
         },
 
         
@@ -11317,7 +11346,7 @@ Ext.Element.addMethods({
         },
         
         toggleClass : function() {
-            throw "Component: toggleClass has been deprecated. Please use toggleCls.";
+            throw new Error("Component: toggleClass has been deprecated. Please use toggleCls.");
         },
 
         
@@ -11326,7 +11355,7 @@ Ext.Element.addMethods({
         },
         
         hasClass : function() {
-            throw "Element: hasClass has been deprecated. Please use hasCls.";
+            throw new Error("Element: hasClass has been deprecated. Please use hasCls.");
             return this.hasCls.apply(this, arguments);
         },
 
@@ -11336,7 +11365,7 @@ Ext.Element.addMethods({
         },
         
         replaceClass : function() {
-            throw "Component: replaceClass has been deprecated. Please use replaceCls.";
+            throw new Error("Component: replaceClass has been deprecated. Please use replaceCls.");
         },
 
         isStyle: function(style, val) {
@@ -11572,18 +11601,6 @@ Ext.Element.addMethods({
     },
     
     
-    getScrollParent : function() {
-        var parent = this.dom, scroller;
-        while (parent && parent != document.body) {
-            if (parent.id && (scroller = Ext.ScrollManager.get(parent.id))) {
-                return scroller;
-            }
-            parent = parent.parentNode;
-        }
-        return null;
-    },
-
-    
     findParentNode : function(simpleSelector, maxDepth, returnEl) {
         var p = Ext.fly(this.dom.parentNode, '_internal');
         return p ? p.findParent(simpleSelector, maxDepth, returnEl) : null;
@@ -11658,6 +11675,21 @@ Ext.Element.addMethods({
                 return !returnDom ? Ext.get(n) : n;
             }
             n = n[dir];
+        }
+        return null;
+    }
+});
+
+
+Ext.Element.addMethods({
+    
+    getScrollParent : function() {
+        var parent = this.dom, scroller;
+        while (parent && parent != document.body) {
+            if (parent.id && (scroller = Ext.ScrollManager.get(parent.id))) {
+                return scroller;
+            }
+            parent = parent.parentNode;
         }
         return null;
     }
@@ -11744,7 +11776,25 @@ Ext.Element.addMethods({
         el.remove();
         return this;
     },
-
+    
+    
+    replaceWith: function(el){
+        var me = this;
+            
+        if(el.nodeType || el.dom || typeof el == 'string'){
+            el = Ext.get(el);
+            me.dom.parentNode.insertBefore(el, me.dom);
+        }else{
+            el = Ext.DomHelper.insertBefore(me.dom, el);
+        }
+        
+        delete Ext.cache[me.id];
+        Ext.removeNode(me.dom);      
+        me.id = Ext.id(me.dom = el);
+        Ext.Element.addToCache(me.isFlyweight ? new Ext.Element(me.dom) : me);     
+        return me;
+    },
+    
     
     createChild : function(config, insertBefore, returnDom) {
         config = config || {tag:'div'};
@@ -11809,7 +11859,7 @@ Ext.Element.addMethods({
         el = Ext.get(el);
 
         if (!el || !el.dom) {
-            throw "Element.alignToXY with an element that doesn't exist";
+            throw new Error("Element.alignToXY with an element that doesn't exist");
         }
         offsets = offsets || [0, 0];
 
@@ -12245,7 +12295,7 @@ Ext.Element.select = function(selector, root, composite) {
     } else if (selector.length !== undefined) {
         els = selector;
     } else {
-        throw "Invalid selector";
+        throw new Error("Invalid selector");
     }
     return composite ? new Ext.CompositeElement(els) : els;
 };
@@ -12525,7 +12575,10 @@ Ext.query = Ext.DomQuery.select;
 
 Ext.Anim = Ext.extend(Object, {
     isAnim: true,
-    disableAnimations: (Ext.is.Android || Ext.is.Blackberry) ? true : false,
+    
+    
+    disableAnimations: false,
+
 
     defaultConfig: {
         
@@ -12545,12 +12598,6 @@ Ext.Anim = Ext.extend(Object, {
 
         
         autoClear: true,
-
-        
-        autoReset: false,
-
-        
-        autoShow: true,
 
         
         out: true,
@@ -12603,7 +12650,7 @@ Ext.Anim = Ext.extend(Object, {
 
         return config;
     },
-
+    
     run: function(el, config) {
         el = Ext.get(el);
         config = config || {};
@@ -12717,6 +12764,7 @@ Ext.Anim = Ext.extend(Object, {
 });
 
 Ext.Anim.seed = 1000;
+
 
 Ext.Anim.run = function(el, anim, config) {
     if (el.isComponent) {
@@ -12888,8 +12936,8 @@ Ext.anims = {
         }
     })
 };
+
 Ext.apply(Ext.anims, {
-    
     
     flip: new Ext.Anim({
         is3d: true,
@@ -13045,11 +13093,11 @@ Ext.apply(Ext.anims, {
 
 Ext.apply(Ext, {
     
-    version : '0.9.9',
+    version : '1.0.0RC',
     versionDetail : {
-        major : 0,
-        minor : 9,
-        patch : 9
+        major : 1,
+        minor : 0,
+        patch : '0RC'
     },
     
     
@@ -13368,14 +13416,14 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
         return {
             width: window.innerWidth,
             height: window.innerHeight
-        }
+        };
     },
 
     getOffset: function() {
         return {
             x: window.pageXOffset,
             y: window.pageYOffset
-        }
+        };
     },
 
     scrollToTop: function(delay, fn) {
@@ -13386,10 +13434,11 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
                     setTimeout(fn, 0);
                 }
             }, delay);
-        } else {
+        }
+        else {
             window.scrollTo(0, Ext.is.Android ? -1 : 0);
             if (fn) {
-                setTimeout(fn, 0)
+                setTimeout(fn, 0);
             }
         }
     },
@@ -13399,7 +13448,8 @@ Ext.Viewport = new (Ext.extend(Ext.util.Observable, {
 
         if (window.hasOwnProperty('orientation')) {
             return (window.orientation == 0 || window.orientation == 180) ? 'portrait' : 'landscape';
-        } else {
+        }
+        else {
             if (Ext.is.Android) {
                 if ((size.width == this.lastSize.width && size.height < this.lastSize.height) ||
                     (size.height == this.lastSize.height && size.width < this.lastSize.width)) {
@@ -16473,8 +16523,6 @@ Ext.data.Connection = Ext.extend(Ext.util.Observable, {
     useDefaultXhrHeader : true,
     defaultXhrHeader : 'XMLHttpRequest',
 
-    requests: {},
-
     constructor : function(config) {
         config = config || {};
         Ext.apply(this, config);
@@ -16487,7 +16535,7 @@ Ext.data.Connection = Ext.extend(Ext.util.Observable, {
             
             'requestexception'
         );
-
+        this.requests = {};
         Ext.data.Connection.superclass.constructor.call(this);
     },
 
@@ -16801,13 +16849,16 @@ Ext.gesture.Manager = new Ext.AbstractManager({
         
         document.addEventListener(this.startEvent, Ext.createDelegate(this.onTouchStart, this), true);
         document.addEventListener(this.endEvent, Ext.createDelegate(this.onTouchEnd, this), true);
-        document.addEventListener('click', Ext.createDelegate(this.onClick, this), true);
 
-        this.addEventListener(Ext.getBody(), 'tap', Ext.emptyFn, {capture: true, fireClickEvent: true});
-        
-        if (Ext.is.Blackberry) {
-            document.addEventListener('mousedown', this.onMouseDown, false);
+        if (!Ext.is.Desktop) {
+            document.addEventListener('click', Ext.createDelegate(this.onClick, this), true);
+            this.addEventListener(Ext.getBody(), 'tap', Ext.emptyFn, {capture: true, fireClickEvent: true});
         }
+
+        
+
+
+
     },
 
     onClick: function(e) {
@@ -18635,7 +18686,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         Ext.Component.superclass.onRender.apply(this, arguments);
 
         if (this.monitorOrientation) {
-            this.el.addCls('x-' + Ext.orientation);
+            this.el.addCls('x-' + Ext.Viewport.orientation);
         }
 
         if (this.floating) {
@@ -18653,7 +18704,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
 
     afterRender : function() {
         if (this.fullscreen) {
-            this.layoutOrientation(Ext.orientation, this.width, this.height);
+            this.layoutOrientation(Ext.Viewport.orientation, this.width, this.height);
         }
         Ext.Component.superclass.afterRender.call(this);
     },
@@ -19003,7 +19054,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         }
 
         Ext.destroy(this.scroller);
-        this.scroler = null;
+        this.scroller = null;
         
         if (config !== false) {
             var direction = Ext.isObject(config) ? config.direction: config;
@@ -19103,6 +19154,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         if (this.floating && this.modal && !this.hidden) {
             this.el.parent().unmask();
         }
+        Ext.destroy(this.scroller);
         Ext.Component.superclass.beforeDestroy.call(this);
     },
     
@@ -19340,7 +19392,7 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
         if (this.fireEvent('beforeadd', this, cmp, index) !== false && this.onBeforeAdd(cmp) !== false) {
             this.items.insert(index, cmp);
             cmp.onAdded(this, index);
-            this.onAdd(cmp);
+            this.onAdd(cmp, index);
             this.fireEvent('add', this, cmp, index);
         }
 
@@ -19369,6 +19421,9 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
     
     remove : function(comp, autoDestroy) {
         var c = this.getComponent(comp);
+			if (!c) {
+            	console.warn("Attempted to remove a component that does not exist. Ext.Container: remove takes an argument of the component to remove. cmp.remove() is incorrect usage.");				
+			}
         
         if (c && this.fireEvent('beforeremove', this, c) !== false) {
             this.doRemove(c, autoDestroy);
@@ -19390,13 +19445,13 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
             layout.onRemove(component);
         }
         
-        this.onRemove(component);
+        this.onRemove(component, autoDestroy);
 
         if (autoDestroy === true || (autoDestroy !== false && this.autoDestroy)) {
             component.destroy();
         }
 
-        if (hasLayout) {
+        if (hasLayout && !autoDestroy) {
             layout.afterRemove(component);
         }
     },
@@ -19468,8 +19523,9 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
         return this.query(selector)[0] || null;
     },
 
+    
     show : function() {
-        Ext.lib.Container.superclass.show.call(this);
+        Ext.lib.Container.superclass.show.apply(this, arguments);
         
         var layoutCollection = this.layoutOnShow,
             ln = layoutCollection.getCount(),
@@ -19505,6 +19561,7 @@ Ext.lib.Container = Ext.extend(Ext.Component, {
     }
 });
 
+
 Ext.Container = Ext.extend(Ext.lib.Container, {
     
     cardSwitchAnimation: null,
@@ -19527,7 +19584,7 @@ Ext.Container = Ext.extend(Ext.lib.Container, {
         }
         
         if (Ext.isDefined(this.animation)) {
-            throw new Error("Container: animation has been removed. Please use cardSwitchAnimation.");
+            console.warn("Container: animation has been removed. Please use cardSwitchAnimation.");
             this.cardSwitchAnimation = this.animation;
         }
 
@@ -19568,9 +19625,10 @@ Ext.Container = Ext.extend(Ext.lib.Container, {
     handleFieldEventListener: function(isAdding, item) {
         if (!this.fieldEventWrap)
             this.fieldEventWrap = {};
-
+            
+        
         if (['textfield', 'passwordfield', 'emailfield',
-             'textarea', 'searchfield', 'urlfield', 'numberfield', 'spinnerfield'].indexOf(item.xtype) !== -1) {
+             'textarea', 'textareafield', 'searchfield', 'urlfield', 'numberfield', 'spinnerfield'].indexOf(item.xtype) !== -1) {
             if (isAdding) {
                 this.fieldEventWrap[item.id] = {
                     beforefocus: function(e) {this.onFieldBeforeFocus(item, e);},
@@ -19911,7 +19969,7 @@ Ext.lib.Panel = Ext.extend(Ext.Container, {
             item.destroy();
         }
 
-        if (hasLayout) {
+        if (hasLayout && !autoDestroy) {
             layout.afterRemove(item);
         }
         this.doComponentLayout();
@@ -21462,7 +21520,7 @@ Ext.DataView.override({
     
     addCmpEvents: function() {
         if (Ext.isDefined(this.forceSelection)) {
-            throw "DataView: forceSelection has been replaced by allowDeselect.";
+            throw new Error("DataView: forceSelection has been replaced by allowDeselect.");
         }
 
         this.addEvents(
@@ -21689,7 +21747,7 @@ Ext.List = Ext.extend(Ext.DataView, {
         }
         
         if (!Ext.isDefined(this.itemTpl)) {
-            throw new Error("Ext.List: itemTpl is a required configuration.")
+            throw new Error("Ext.List: itemTpl is a required configuration.");
         }
         
         
@@ -22549,11 +22607,6 @@ Ext.TabBar = Ext.extend(Ext.Panel, {
 
         Ext.TabBar.superclass.initComponent.call(this);
 
-        var cardLayout = this.cardLayout;
-        if (cardLayout) {
-            this.cardLayout = null;
-            this.setCardLayout(cardLayout);
-        }
     },
 
     
@@ -22614,55 +22667,12 @@ Ext.TabBar = Ext.extend(Ext.Panel, {
     },
 
     
-    setCardLayout : function(layout) {
-        if (this.cardLayout) {
-            this.mun(this.cardLayout.owner, {
-                add: this.onCardAdd,
-                remove: this.onCardRemove,
-                scope: this
-            });
-        }
-        this.cardLayout = layout;
-        if (layout) {
-            this.mon(layout.owner, {
-                add: this.onCardAdd,
-                remove: this.onCardRemove,
-                scope: this
-            });
-        }
-    },
-
-    
-    onCardAdd : function(panel, card, idx) {
-        card.tab = this.insert(idx, {
-            xtype: 'tab',
-            card: card
-        });
-    },
-
-    
-    onCardRemove : function(panel, card) {
-        var items = this.items.items,
-            ln = items.length,
-            i, item;
-
-        for (i = 0; i < ln; i++) {
-            item = items[i];
-            if (item.card === card) {
-                item.card = null;
-                this.remove(item, true);
-                return;
-            }
-        }
-    },
-
     getCardLayout : function() {
         return this.cardLayout;
     }
 });
 
 Ext.reg('tabbar', Ext.TabBar);
-
 
 
 Ext.Tab = Ext.extend(Ext.Button, {
@@ -22774,7 +22784,7 @@ Ext.TabPanel = Ext.extend(Ext.Panel, {
     
     initComponent : function() {
         if (Ext.isDefined(this.tabBarPosition)) {
-            throw "TabPanel: tabBarPosition has been removed. Please use tabBarDock.";
+            throw new Error("TabPanel: tabBarPosition has been removed. Please use tabBarDock.");
         }
 
         
@@ -22804,12 +22814,26 @@ Ext.TabPanel = Ext.extend(Ext.Panel, {
     
     getTabBar : function() {
         return this.tabBar;
+    },
+    
+    
+    
+    onAdd: function(cmp, idx) {
+        var tabBar = this.tabBar;
+        
+        cmp.tab = tabBar.insert(idx, {
+            xtype: 'tab',
+            card: cmp
+        });
+        tabBar.doLayout();
+    },
+    
+    
+    onRemove: function(cmp, autoDestroy) {
+        
+        this.tabBar.remove(cmp.tab, autoDestroy);
+        this.tabBar.doLayout();
     }
-    
-    
-    
-    
-    
 });
 
 Ext.reg('tabpanel', Ext.TabPanel);
@@ -22875,6 +22899,7 @@ Ext.Carousel = Ext.extend(Ext.Panel, {
         this.mon(this.body, {
             dragstart: this.onDragStart,
             drag: this.onDrag,
+            dragThreshold: 6,
             dragend: this.onDragEnd,
             direction: this.direction,
             disableLocking: true,
@@ -23309,7 +23334,7 @@ Ext.Map = Ext.extend(Ext.Component, {
         this.scroll = false;
         
         if (Ext.isDefined(this.getLocation)) {
-            throw "SpinnerField: getLocation has been removed. Please use useCurrentLocation.";
+            console.warn("SpinnerField: getLocation has been removed. Please use useCurrentLocation.");
             this.useCurrentLocation = this.getLocation;
         }
         
@@ -23590,7 +23615,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
             return this.title || this.backText;
         
         } else {
-            throw "No RecordNode passed into renderTitleText";
+            throw new Error("No RecordNode passed into renderTitleText");
         }
         
     },
@@ -23783,7 +23808,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
             
             var rootNode = itemsArray[0].recordNode;
             if (rootNode.id !== pathArr[0]) {
-                throw "rootNode doesn't match!";
+                throw new Error("rootNode doesn't match!");
             }
             
 
@@ -23812,7 +23837,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
 
         
         if (!lastCard) {
-            throw "Card was not found when trying to add to NestedList.";
+            throw new Error("Card was not found when trying to add to NestedList.");
         }
         
 
@@ -23916,11 +23941,11 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
     hideOnMaskTap: false,
     
     
-    doneText: 'Done',
+    doneButton: 'Done',
     
     
-    showDoneButton : true,
-    
+    cancelButton: 'Cancel',
+
     
     height: 220,
     
@@ -23939,6 +23964,26 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
     
     
     initComponent : function() {
+        if (Ext.isDefined(this.showDoneButton)) {
+            console.warn("[Ext.Picker] showDoneButton config is deprecated. Please use doneButton instead");
+        }
+
+        if (Ext.isDefined(this.doneText)) {
+            console.warn("[Ext.Picker] doneText config is deprecated. Please use doneButton instead");
+            this.doneButton = this.doneText;
+        }
+
+        this.addEvents(
+            
+            'pick',
+
+            
+            'change',
+
+            
+            'cancel'
+        );
+            
         this.layout = {
             type: 'hbox',
             align: 'stretch'
@@ -23956,37 +24001,64 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
         }
 
         this.on('slotpick', this.onSlotPick, this);
-        this.addEvents('pick', 'change');
 
-        if (this.showDoneButton) {
+        if (this.doneButton || this.cancelButton) {
+            var toolbarItems = [];
+
+            if (this.cancelButton) {
+                toolbarItems.push(
+                    Ext.apply(
+                        {
+                            ui: 'decline',
+                            handler: this.onCancelButtonTap,
+                            scope: this
+                        },
+                        ((Ext.isObject(this.cancelButton) ? this.cancelButton : { text: String(this.cancelButton) }))
+                    )
+                );
+            }
+
+            toolbarItems.push({xtype: 'spacer'});
+
+            if (this.doneButton) {
+                toolbarItems.push(
+                    Ext.apply(
+                        {
+                            ui: 'action',
+                            handler: this.onDoneButtonTap,
+                            scope: this
+                        },
+                        ((Ext.isObject(this.doneButton) ? this.doneButton : { text: String(this.doneButton) }))
+                    )
+                );
+            }
+
             this.toolbar = new Ext.Toolbar(Ext.applyIf(this.buttonBar || {
-                dock: 'top'
-            }));
-
-            this.toolbar.add([
-                {xtype: 'spacer'},
-                {
-                    xtype: 'button',
-                    ui: 'action',
-                    text: this.doneText,
-                    handler: this.onDoneTap,
-                    scope: this
+                dock: 'top',
+                items: toolbarItems,
+                defaults: {
+                    xtype: 'button'
                 }
-            ]);
-
+            }));
+           
             this.dockedItems = this.dockedItems ? (Ext.isArray(this.dockedItems) ? this.dockedItems : [this.dockedItems]) : [];
             this.dockedItems.push(this.toolbar);
         }
 
         Ext.Picker.superclass.initComponent.call(this);
+    },
+
+    
+    afterRender: function() {
+        Ext.Picker.superclass.afterRender.apply(this, arguments);
 
         if (this.value) {
             this.setValue(this.value, false);
         }
     },
+
     
-    
-    onDoneTap : function() {
+    onDoneButtonTap : function() {
         var anim = this.animSheet('exit');
         Ext.apply(anim, {
             after: function() {
@@ -23996,16 +24068,30 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
         });
         this.hide(anim);
     },
+
+    
+    onCancelButtonTap : function() {
+        var anim = this.animSheet('exit');
+        Ext.apply(anim, {
+            after: function() {
+                
+                this.setValue(this.values);
+                this.fireEvent('cancel', this);
+            },
+            scope: this
+        });
+        this.hide(anim);
+    },
     
     
-    onSlotPick : function(slot, value, node) {
+    onSlotPick: function(slot, value, node) {
         this.fireEvent('pick', this, this.getValue(), slot);
         return false;
     },
     
     
-    setValue : function(values, animated) {
-        var key, slot,
+    setValue: function(values, animated) {
+        var slot,
             items = this.items.items,
             ln = items.length;
 
@@ -24014,31 +24100,35 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
             for (var i = 0; i < ln; i++) {
                 items[i].setValue(0);
             }
+            
             return this;
         }
 
-        for (key in values) {
+        Ext.iterate(values, function(key, value) {
             slot = this.child('[name=' + key + ']');
+            
             if (slot) {
-                slot.setValue(values[key], animated);
+                slot.setValue(value, animated);
             }
-        }
+        }, this);
 
+        this.values = values;
+       
         return this;
     },
     
     
-    getValue : function() {
-        var value = {},
+    getValue: function() {
+        var values = {},
             items = this.items.items,
             ln = items.length, item, i;
 
         for (i = 0; i < ln; i++) {
             item = items[i];
-            value[item.name] = item.getValue();
+            values[item.name] = item.getValue();
         }
 
-        return value;
+        return values;
     }
 });
 
@@ -24049,6 +24139,7 @@ Ext.regModel('x-textvalue', {
 
 Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     isSlot: true,
+    
     flex: 1,
 
     
@@ -24080,7 +24171,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     selectedIndex: 0,
     
     
-    getElConfig : function() {
+    getElConfig: function() {
         return {
             tag: 'div',
             id: this.id,
@@ -24092,7 +24183,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     initComponent : function() {
         
         if (!this.name) {
-            throw 'Each picker slot is required to have a name.';
+            throw new Error('Each picker slot is required to have a name.');
         }
         
 
@@ -24184,14 +24275,14 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     },
     
     
-    afterComponentLayout : function() {
+    afterComponentLayout: function() {
         
         
         Ext.defer(this.setupBar, 200, this);
     },
     
     
-    initEvents : function() {
+    initEvents: function() {
         this.mon(this.scroller, {
             scrollend: this.onScrollEnd,
             scope: this
@@ -24199,7 +24290,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     },
     
     
-    onScrollEnd : function(scroller, offset) {
+    onScrollEnd: function(scroller, offset) {
         this.selectedNode = this.getNode(Math.round(offset.y / this.barHeight));
         this.selectedIndex = this.indexOf(this.selectedNode);
         this.fireEvent('slotpick', this, this.getValue(), this.selectedNode);
@@ -24214,18 +24305,18 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     },
     
     
-    onItemTap : function(node) {
+    onItemTap: function(node) {
         Ext.Picker.Slot.superclass.onItemTap.apply(this, arguments);
         this.setSelectedNode(node);
     },
     
     
-    getSelectedNode : function() {
+    getSelectedNode: function() {
         return this.selectedNode;
     },
     
     
-    setSelectedNode : function(selected, animate) {
+    setSelectedNode: function(selected, animate) {
         
         if (Ext.isNumber(selected)) {
             selected = this.getNode(selected);
@@ -24243,13 +24334,13 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     },
     
     
-    getValue : function() {
+    getValue: function() {
         var record = this.store.getAt(this.selectedIndex);
         return record ? record.get(this.valueField) : null;
     },
 
     
-    setValue : function(value, animate) {
+    setValue: function(value, animate) {
         var index = this.store.find(this.valueField, value);
         if (index != -1) {
             if (!this.rendered) {
@@ -24260,7 +24351,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
         }
     },
 
-    onDestroy : function() {
+    onDestroy: function() {
         if (this.tempStore) {
             this.store.destroyStore();
             this.store = null;
@@ -24317,6 +24408,7 @@ Ext.DatePicker = Ext.extend(Ext.Picker, {
         }
 
         daysInMonth = this.getDaysInMonth(1, new Date().getFullYear());
+
         for (i = 0; i < daysInMonth; i++) {
             days.push({
                 text: i + 1,
@@ -24332,30 +24424,22 @@ Ext.DatePicker = Ext.extend(Ext.Picker, {
         }
 
         this.slots = [];
-        Ext.each(this.slotOrder, function(item){
+        
+        this.slotOrder.forEach(function(item){
             this.slots.push(this.createSlot(item, days, months, years));
         }, this);
 
-        
-        
-        if (this.value) {
-            var value = this.value;
-            
-            if (Ext.isDate(value)) {
-                this.value = {
-                    day : value.getDate(),
-                    year: value.getFullYear(),
-                    month: value.getMonth() + 1
-                };
-            } else if (Ext.isObject(value)) {
-                this.value = value;
-            };
-        }
         Ext.DatePicker.superclass.initComponent.call(this);
+    },
+
+    afterRender: function() {
+        Ext.DatePicker.superclass.afterRender.apply(this, arguments);
+        
+        this.setValue(this.value);
     },
     
     createSlot: function(name, days, months, years){
-        switch(name){
+        switch (name) {
             case 'year':
                 return {
                     name: 'year',
@@ -24401,7 +24485,7 @@ Ext.DatePicker = Ext.extend(Ext.Picker, {
             daySlot.scroller.updateBoundary(true);
         }
 
-        Ext.DatePicker.superclass.onSlotPick.call(this, slot, value);
+        Ext.DatePicker.superclass.onSlotPick.apply(this, arguments);
     },
 
     
@@ -24411,6 +24495,25 @@ Ext.DatePicker = Ext.extend(Ext.Picker, {
             day = Math.min(value.day, daysInMonth);
 
         return new Date(value.year, value.month-1, day);
+    },
+
+    
+    setValue: function(value, animated) {
+        if (!Ext.isDate(value) && !Ext.isObject(value)) {
+            value = null;
+        }
+
+        if (Ext.isDate(value)) {
+            this.value = {
+                day : value.getDate(),
+                year: value.getFullYear(),
+                month: value.getMonth() + 1
+            };
+        } else {
+            this.value = value;
+        }
+
+        return Ext.DatePicker.superclass.setValue.call(this, this.value, animated);
     },
 
     
@@ -24599,22 +24702,22 @@ Ext.reg('audio', Ext.Audio);
 
 Ext.MessageBox = Ext.extend(Ext.Sheet, {
     
-    centered         : true,
+    centered: true,
 
     
-    renderHidden     : true,
+    renderHidden: true,
 
     
-    ui               : 'dark',
+    ui: 'dark',
 
     
-    componentCls     : 'x-msgbox',
+    componentCls: 'x-msgbox',
 
     
-    enterAnimation        : 'pop',
+    enterAnimation: 'pop',
 
     
-    exitAnimation         : 'pop',
+    exitAnimation: 'pop',
 
 
 
@@ -24857,8 +24960,7 @@ Ext.MessageBox = Ext.extend(Ext.Sheet, {
             msg : msg,
             buttons: Ext.MessageBox.YESNO,
             fn: function(button) {
-                if (button == 'yes')
-                    fn.apply(scope);
+                fn.call(scope, button);
             },
             scope : scope,
             icon: Ext.MessageBox.QUESTION
@@ -24872,8 +24974,7 @@ Ext.MessageBox = Ext.extend(Ext.Sheet, {
             msg : msg,
             buttons: Ext.MessageBox.OKCANCEL,
             fn: function(button, inputValue) {
-                if (button == 'ok')
-                    fn.call(scope, inputValue);
+                fn.call(scope, button, inputValue);
             },
             scope : scope,
             icon  : Ext.MessageBox.QUESTION,
@@ -24938,6 +25039,9 @@ Ext.MessageBox = Ext.extend(Ext.Sheet, {
 
 })();
 
+Ext.reg('messagebox', Ext.MessageBox);
+
+
 Ext.reg('msgbox', Ext.MessageBox);
 
 
@@ -24950,7 +25054,7 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
     componentCls: 'x-form',
     
     
-    url : undefined,
+    url: undefined,
     
     
     baseParams : undefined,
@@ -24960,7 +25064,7 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
         '<div class="{cls}">{message}&hellip;</div>'
     ),
 
-    getElConfig : function() {
+    getElConfig: function() {
         return Ext.apply(Ext.form.FormPanel.superclass.getElConfig.call(this), {
             tag: 'form'
         });
@@ -24982,10 +25086,8 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
     
     
     afterRender : function() {
-        var me = this;
-
         Ext.form.FormPanel.superclass.afterRender.call(this);
-        me.el.on('submit', this.onSubmit, this);
+        this.el.on('submit', this.onSubmit, this);
     },
 
     
@@ -24999,9 +25101,11 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
     
     
 
-    submit : function(options) {
+    submit: function(options) {
         var form = this.el.dom || {},
-            O = Ext.apply({
+            formValues
+
+            options = Ext.apply({
                url : this.url || form.action,
                submitDisabled : false,
                method : form.method || 'post',
@@ -25011,58 +25115,63 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
                headers : null,
                success : null,
                failure : null
-            }, options || {}),
-            formValues = this.getValues(this.standardSubmit || !O.submitDisabled);
+            }, options || {});
+
+            formValues = this.getValues(this.standardSubmit || !options.submitDisabled);
         
         if (this.standardSubmit) {
             if (form) {
-                if (O.url && Ext.isEmpty(form.action)) {
-                    form.action = O.url;
+                if (options.url && Ext.isEmpty(form.action)) {
+                    form.action = options.url;
                 }
-                form.method = (O.method || form.method).toLowerCase();
+
+                form.method = (options.method || form.method).toLowerCase();
+
                 if (this.fireEvent('beforesubmit', this, formValues, options) !== false) {
                     form.submit();
                 }
             }
             return null;
         }
+        
         if (this.fireEvent('beforesubmit', this, formValues, options ) !== false) {
-            if (O.waitMsg) {
-                this.showMask(O.waitMsg);
+            if (options.waitMsg) {
+                this.showMask(options.waitMsg);
             }
             
             return Ext.Ajax.request({
-                url     : O.url,
-                method  : O.method,
+                url     : options.url,
+                method  : options.method,
                 rawData : Ext.urlEncode(Ext.apply(
-                    Ext.apply({},this.baseParams || {}),
-                    O.params || {},
+                    Ext.apply({}, this.baseParams || {}),
+                    options.params || {},
                     formValues
-                  )),
-                autoAbort : O.autoAbort,
+                )),
+                autoAbort : options.autoAbort,
                 headers  : Ext.apply(
                    {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-                    O.headers || {}),
+                    options.headers || {}),
                 scope    : this,
                 callback : function(options, success, response) {
-                     var R = response;
                      this.hideMask();   
                         
                      if (success) {
-                          R = Ext.decode(R.responseText);
-                          success = !!R.success;
-                          if (success) {
-                              if (typeof O.success == 'function') {
-                                 O.scope ? O.success.call(O.scope, this, R) : O.success(this, R);
-                              }
-                              this.fireEvent('submit', this, R);
-                              return;
-                          }
-                     }
-                    if (typeof O.failure == 'function') {
-                        O.scope ? O.failure.call(O.scope, this, R) : O.failure(this, R);
+                          response = Ext.decode(response.responseText);
+                          success = !!response.success;
+                        if (success) {
+                            if (typeof options.success == 'function') {
+                                options.scope ? options.success.call(options.scope, this, response) : options.success(this, response);
+                            }
+                            this.fireEvent('submit', this, response);
+                            return;
+                        }
                     }
-                    this.fireEvent('exception', this, R);
+
+                    if (typeof options.failure == 'function') {
+                        options.scope ? options.failure.call(options.scope, this, response) : options.failure(this, response);
+                    }
+                    
+                    this.fireEvent('exception', this, response);
                 }
             });
         }
@@ -25105,21 +25214,37 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
         return this;
     },
     
-    updateModel : function() {
-        throw "FormPanel: updateModel has been deprecated. Please use updateRecord.";
+    updateModel: function() {
+        console.warn("FormPanel: updateModel has been deprecated. Please use updateRecord.");
+        this.updateRecord.apply(this, arguments);
     },
 
     
     setValues: function(values) {
          var fields = this.getFields(),
-            name, field;
+             name,
+             field;
+             
         values = values || {};
+        
         for (name in values) {
-            if (values.hasOwnProperty(name) && name in fields) {
-                field = fields[name];
-                field.setValue && field.setValue(values[name]);
+            if (values.hasOwnProperty(name)) {
+                if (Ext.isArray(fields[name])) {
+                    fields[name].forEach(function(field) {
+                        if (Ext.isArray(values[name])) {
+                            field.setChecked((values[name].indexOf(field.getValue()) != -1));
+                        } else {
+                            field.setChecked((values[name] == field.getValue()));
+                        }
+                    });
+                } else {
+                    field = fields[name];
+
+                    field.setValue(values[name]);
+                }
             }       
         }
+        
         return this;
     },
 
@@ -25132,38 +25257,68 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
 
         for (name in fields) {
             if (fields.hasOwnProperty(name)) {
-                field = fields[name];
-                if (enabled && field.disabled) {
-                    continue;
-                }
-                if (field.getValue) {
-                    values[name] = field.getGroupValue ? field.getGroupValue() : field.getValue();
+                if (Ext.isArray(fields[name])) {
+                    values[name] = [];
+
+                    fields[name].forEach(function(field) {
+                        if (field.isChecked() && !(enabled && field.disabled)) {
+                            if (field instanceof Ext.form.Radio) {
+                                values[name] = field.getValue();
+                            } else {
+                                values[name].push(field.getValue());
+                            }
+                        }
+                    });
+                } else {
+                    field = fields[name];
+                    
+                    if (!(enabled && field.disabled)) {
+                        if (field instanceof Ext.form.Checkbox) {
+                            values[name] = (field.isChecked()) ? field.getValue() : null;
+                        } else {
+                            values[name] = field.getValue();
+                        }
+                    }
                 }
             }
         }
 
         return values;
-
     },
 
     
     reset: function() {
-        var fields = this.getFields(),
-            name;
-        for (name in fields) {
-            if(fields.hasOwnProperty(name)){
-                fields[name].reset();
-            }
-        }
+        this.getFieldsAsArray().forEach(function(field) {
+            field.reset();
+        });
+
+        return this;
     },
 
     
-    getFields: function() {
-        var fields = {};
+    enable: function() {
+        this.getFieldsAsArray().forEach(function(field) {
+            field.enable();
+        });
+
+        return this;
+    },
+
+    
+    disable: function() {
+        this.getFieldsAsArray().forEach(function(field) {
+            field.disable();
+        });
+
+        return this;
+    },
+
+    getFieldsAsArray: function() {
+        var fields = [];
 
         var getFieldsFrom = function(item) {
             if (item.isField) {
-                fields[item.getName()] = item;
+                fields.push(item);
             }
 
             if (item.isContainer) {
@@ -25172,7 +25327,41 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
         };
 
         this.items.each(getFieldsFrom);
+
         return fields;
+    },
+
+    
+    getFields: function(byName) {
+        var fields = {},
+            itemName;
+
+        var getFieldsFrom = function(item) {
+            if (item.isField) {
+                itemName = item.getName();
+
+                if ((byName && itemName == byName) || typeof byName == 'undefined') {
+                    if (fields.hasOwnProperty(itemName)) {
+                        if (!Ext.isArray(fields[itemName])) {
+                            fields[itemName] = [fields[itemName]];
+                        }
+
+                        fields[itemName].push(item);
+                    } else {
+                        fields[itemName] = item;
+                    }
+                }
+
+            }
+
+            if (item.isContainer) {
+                item.items.each(getFieldsFrom);
+            }
+        };
+
+        this.items.each(getFieldsFrom);
+        
+        return (byName) ? (fields[byName] || []) : fields;
     },
 
     getFieldsFromItem: function() {
@@ -25202,6 +25391,9 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
 
 Ext.form.FormPanel.prototype.load = Ext.form.FormPanel.prototype.loadModel; 
 
+Ext.reg('formpanel', Ext.form.FormPanel);
+
+
 Ext.reg('form', Ext.form.FormPanel);
 
 
@@ -25222,6 +25414,7 @@ Ext.form.FieldSet = Ext.extend(Ext.Panel, {
     
     afterLayout : function(layout) {
         Ext.form.FieldSet.superclass.afterLayout.call(this, layout);
+        
         if (this.title && !this.titleEl) {
             this.setTitle(this.title);
         } else if (this.titleEl) {
@@ -25269,8 +25462,6 @@ Ext.form.FieldSet = Ext.extend(Ext.Panel, {
 Ext.reg('fieldset', Ext.form.FieldSet);
 
 Ext.form.Field = Ext.extend(Ext.Component,  {
-    ui: 'text',
-
     
     isField: true,
 
@@ -25285,31 +25476,17 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
     
 
     
+    fieldCls: 'x-form-field',
+
     baseCls: 'x-field',
 
     
     inputCls: undefined,
 
     
-    focusCls: 'x-field-focus',
-    
-    
-    maxLength: 0,
-    
-    
-    placeHolder: undefined,
-    
-    
-    autoComplete: undefined,
-    
-    
-    autoCapitalize: undefined,
-    
-    
-    autoCorrect: undefined,
+    disabled: false,
 
     renderTpl: [
-
         '<tpl if="label"><div class="x-form-label"><span>{label}</span></div></tpl>',
         '<tpl if="fieldEl">',
             '<div class="x-form-field-container"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}"',
@@ -25320,20 +25497,14 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
                 '<tpl if="autoComplete">autocomplete="{autoComplete}" </tpl>',
                 '<tpl if="autoCapitalize">autocapitalize="{autoCapitalize}" </tpl>',
                 '<tpl if="autoCorrect">autocorrect="{autoCorrect}" </tpl> />',
-            '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+            '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
             '</div>',
-            '<tpl if="showClear"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div><div></tpl>',
+            '<tpl if="useClearIcon"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div><div></tpl>',
         '</tpl>',
     ],
 
     
-    disabled: false,
-
-    
     isFormField: true,
-
-    
-    isFocused: false,
 
     
     autoCreateField: true,
@@ -25352,32 +25523,31 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
     
     required: false,
 
-    maskField: false,
+    useMask: false,
 
     
     initComponent: function() {
-        
-        this.label = this.label || this.fieldLabel;
+        if (Ext.isDefined(this.fieldLabel)) {
+            console.warn("[Ext.form.Field] fieldLabel has been deprecated. Please use label instead.");
+            this.label = this.fieldLabel;
+        }
+
+        if (Ext.isDefined(this.fieldClass)) {
+            console.warn("[Ext.form.Field] fieldClass has been deprecated. Please use fieldCls instead.");
+            this.fieldCls = this.fieldClass;
+        }
+
+        if (Ext.isDefined(this.focusClass)) {
+            console.warn("[Ext.form.Field] focusClass has been deprecated. Please use focusCls instead.");
+            this.focusCls = this.focusClass;
+        }
+
+        if (Ext.isDefined(this.inputValue)) {
+            console.warn("[Ext.form.Field] inputValue has been deprecated. Please use value instead.");
+            this.value = this.inputValue;
+        }
 
         Ext.form.Field.superclass.initComponent.call(this);
-        this.addEvents(
-            
-            'focus',
-            
-            'blur',
-            
-            'change',
-            
-            'keyup'
-        );
-        
-        if (Ext.isDefined(this.fieldClass)) {
-            throw "Field: fieldClass has been deprecated. Please use fieldCls.";
-        }
-        
-        if (Ext.isDefined(this.focusClass)) {
-            throw "Field: focusClass has been deprecated. Please use focusCls.";
-        }
     },
 
     
@@ -25390,65 +25560,45 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         this.renderSelectors = Ext.applyIf(this.renderSelectors || {}, {
             mask: '.x-field-mask',
             labelEl: 'label',
-            clearEl: '.x-field-clear',
-            clearContainerEl: '.x-field-clear-container',
             fieldEl: '.' + Ext.util.Format.trim(this.renderData.fieldCls).replace(/ /g, '.')
         });
+
         Ext.form.Field.superclass.applyRenderSelectors.call(this);
     },
     
     initRenderData: function() {
-        var renderData     = Ext.form.Field.superclass.initRenderData.call(this),
-            autoComplete   = this.autoComplete,
-            autoCapitalize = this.autoCapitalize,
-            autoCorrect    = this.autoCorrect;
+        Ext.form.Field.superclass.initRenderData.apply(this, arguments);
         
-        Ext.applyIf(renderData, {
-            disabled:   this.disabled,
-            fieldCls:   'x-input-' + this.inputType + (this.inputCls ? ' ' + this.inputCls: ''),
-            fieldEl:    !this.fieldEl && this.autoCreateField,
-            inputId:    Ext.id(),
-            label:      this.label,
-            labelAlign: 'x-label-align-' + this.labelAlign,
-            name:       this.name || this.id,
-            placeHolder: this.placeHolder,
-            required:   this.required,
-            style:      this.style,
-            tabIndex:   this.tabIndex,
-            maxlength: this.maxLength,
-            inputType:       this.inputType,
-            maskField:  this.maskField,
-            showClear:  this.showClear
+        Ext.applyIf(this.renderData, {
+            disabled    :   this.disabled,
+            fieldCls    :   'x-input-' + this.inputType + (this.inputCls ? ' ' + this.inputCls: ''),
+            fieldEl     :   !this.fieldEl && this.autoCreateField,
+            inputId     :   Ext.id(),
+            label       :    this.label,
+            labelAlign  :   'x-label-align-' + this.labelAlign,
+            name        :   this.getName(),
+            required    :   this.required,
+            style       :   this.style,
+            tabIndex    :   this.tabIndex,
+            inputType   :   this.inputType,
+            useMask     :   this.useMask
         });
         
-        var positive = /true|on/i;
-        
-        if (autoComplete !== undefined) {
-            renderData.autoComplete = positive.test(autoComplete + '') ? 'on': 'off';
-        }
-        
-        if (autoCapitalize !== undefined) {
-            renderData.autoCapitalize = positive.test(autoCapitalize + '') ? 'on': 'off';
-        }
-        
-        if (autoCorrect !== undefined) {
-            renderData.autoCorrect = positive.test(autoCorrect + '') ? 'on': 'off';
-        }
-        
-        this.renderData = renderData;
-        return renderData;
+        return this.renderData;
     },
     
     onRender: function() {
         Ext.form.Field.superclass.onRender.apply(this, arguments);
         
         var cls = [];
+        
         if (this.required) {
             cls.push('x-field-required');
         }
         if (this.label) {
             cls.push('x-label-align-' + this.labelAlign);
         }
+
         this.el.addCls(cls);
     },
     
@@ -25456,52 +25606,32 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         Ext.form.Field.superclass.initEvents.call(this);
         
         if (this.fieldEl) {
-            this.mon(this.fieldEl, {
-                focus: this.onFocus,
-                blur: this.onBlur,
-                keyup: this.onKeyUp,
-                paste: this.checkClear,
-                mousedown: this.onBeforeFocus,
-                scope: this
-            });
-
-            if (this.maskField && this.mask) {
+            if (this.useMask && this.mask) {
                 this.mon(this.mask, {
                     click: this.onMaskTap,
                     scope: this
                 });
             }
-            
-            if(this.clearEl){
-                this.mon(this.clearContainerEl, {
-                    scope: this,
-                    tap: this.onClearTap    
-                });
-            }
         }        
+    },
+
+    isDisabled: function() {
+        return this.disabled;
     },
 
     
     onEnable: function() {
-        this.el.removeCls(this.disabledCls);
-        this.el.dom.disabled = false;
         this.fieldEl.dom.disabled = false;
-        this.checkClear();
     },
 
     
     onDisable: function() {
-        this.el.addCls(this.disabledCls);
-        this.el.dom.disabled = true;
         this.fieldEl.dom.disabled = true;
-        this.checkClear(true);
     },
 
     
     initValue: function() {
-        if (this.value !== undefined) {
-            this.setValue(this.value, true);
-        }
+        this.setValue(this.value || '', true);
 
         
         this.originalValue = this.getValue();
@@ -25512,47 +25642,15 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
         if (this.disabled || !this.rendered) {
             return false;
         }
+        
         return String(this.getValue()) !== String(this.originalValue);
-    },
-    
-    onClearTap: function() {
-        if (!this.disabled) {
-            this.setValue('');
-        }
-    },
-    
-    checkClear: function(force){
-        var clearEl = this.clearEl,
-            fieldEl = this.fieldEl,
-            value = this.getValue();
-
-        if (!(clearEl && fieldEl)) {
-            return;
-        }
-
-        value = Ext.isEmpty(value) ? '': String(value);
-
-        if (force || value.length === 0){
-            clearEl.addCls('x-hidden-visibility');
-            fieldEl.removeCls('x-field-clearable');
-        }
-        else{
-            clearEl.removeCls('x-hidden-visibility');
-            fieldEl.addCls('x-field-clearable');
-        }
-          
     },
 
     
     afterRender: function() {
         Ext.form.Field.superclass.afterRender.call(this);
+        
         this.initValue();
-        this.checkClear();
-    },
-
-    onKeyUp: function(e) {
-        this.checkClear();
-        this.fireEvent('keyup', this, e);
     },
 
     onMaskTap: function(e) {
@@ -25584,100 +25682,22 @@ Ext.form.Field = Ext.extend(Ext.Component,  {
     },
 
     
-    onBeforeFocus: function(e) {
-        this.fireEvent('beforefocus', e);
-    },
-
-    beforeFocus: Ext.emptyFn,
-    
-    
-    onFocus: function(e) {
-        if (this.mask) {
-            if (this.maskCorrectionTimer) {
-                clearTimeout(this.maskCorrectionTimer);
-            }
-
-            this.hideMask();
-        }
-        
-        this.beforeFocus();
-        
-        if (this.focusCls) {
-            this.el.addCls(this.focusCls);
-        }
-
-        if (!this.isFocused) {
-            this.isFocused = true;
-            
-            this.startValue = this.getValue();
-            this.fireEvent('focus', e);
-        }
-        
-    },
-
-    
-    beforeBlur: Ext.emptyFn,
-
-    
-    onBlur: function(e) {
-        this.beforeBlur();
-
-        if (this.focusCls) {
-            this.el.removeCls(this.focusCls);
-        }
-
-        this.isFocused = false;
-
-        var v = this.getValue();
-
-        if (String(v) != String(this.startValue)){
-            this.fireEvent('change', this, v, this.startValue);
-        }
-
-        this.fireEvent('blur', e);
-        this.checkClear();
-        this.showMask();
-        this.postBlur();
-    },
-
-    
-    postBlur: Ext.emptyFn,
-
-    
     getValue: function(){
         if (!this.rendered || !this.fieldEl) {
             return this.value;
         }
+        
         return this.fieldEl.getValue();
     },
-    
-    
-    focus: function(){
-        if (this.rendered && this.fieldEl && this.fieldEl.dom.focus) {
-            this.fieldEl.dom.focus();
-        }
-         
-        return this;
-    },
-    
-    
-    blur: function(){
-        if(this.rendered && this.fieldEl && this.fieldEl.dom.blur) {
-            this.fieldEl.dom.blur();
-        }
-        return this;
-    },
 
     
-    setValue: function(v){
-        this.value = v;
+    setValue: function(value){
+        this.value = value;
 
         if (this.rendered && this.fieldEl) {
-            this.fieldEl.dom.value = (Ext.isEmpty(v) ? '': v);
+            this.fieldEl.dom.value = (Ext.isEmpty(value) ? '' : value);
         }
 
-        this.checkClear();
-        
         return this;
     }
 });
@@ -25710,6 +25730,8 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
     trackWidth: null,
 
     monitorOrientation: true,
+
+    tabIndex: -1,
      
     renderTpl: [
         '<tpl if="label">',
@@ -25804,7 +25826,7 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
             oldValue = thumb.getValue(),
             newValue = me.constrain(value);
 
-        if (me.fireEvent('beforechange', me, thumb, oldValue, newValue) !== false) {
+        if (me.fireEvent('beforechange', me, thumb, newValue, oldValue) !== false) {
             if (moveThumb) {
                 me.moveThumb(thumb, me.getPixelValue(newValue, thumb), animate);
             }
@@ -25812,7 +25834,7 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
             thumb.setValue(newValue);
             me.doComponentLayout();
 
-            me.fireEvent('change', me, thumb, oldValue, newValue);
+            me.fireEvent('change', me, thumb, newValue, oldValue);
         }
     },
 
@@ -25997,6 +26019,9 @@ Ext.form.Slider.Thumb = Ext.extend(Ext.form.Field, {
     }
 });
 
+Ext.reg('sliderthumb', Ext.form.Slider.Thumb);
+
+
 Ext.reg('thumb', Ext.form.Slider.Thumb);
 
 
@@ -26053,7 +26078,13 @@ Ext.form.Toggle = Ext.extend(Ext.form.Slider, {
     }
 });
 
+Ext.reg('togglefield', Ext.form.Toggle);
+
+
+
 Ext.reg('toggle', Ext.form.Toggle);
+
+
 
 Ext.form.Toggle.Thumb = Ext.extend(Ext.form.Slider.Thumb, {
     onRender: function() {
@@ -26070,129 +26101,357 @@ Ext.form.Toggle.Thumb = Ext.extend(Ext.form.Slider.Thumb, {
     }
 });
 
-Ext.form.TextField = Ext.extend(Ext.form.Field, {
-    maskField: Ext.is.iOS,
+Ext.form.Text = Ext.extend(Ext.form.Field, {
+    ui: 'text',
+
+    
+    focusCls: 'x-field-focus',
+
+    
+    maxLength: 0,
+
+    
+    placeHolder: undefined,
+
+    
+    autoComplete: undefined,
+
+    
+    autoCapitalize: undefined,
+
+    
+    autoCorrect: undefined,
+
+    
+    isFocused: false,
+
+    
+    isClearIconVisible: false,
+
+    useMask: Ext.is.iOS,
+
+    initComponent: function() {
+        this.addEvents(
+            
+            'focus',
+            
+            'blur',
+            
+            'keyup',
+            
+            'change'
+        );
+
+        Ext.form.Text.superclass.initComponent.apply(this, arguments);
+    },
+
+    applyRenderSelectors: function() {
+        this.renderSelectors = Ext.applyIf(this.renderSelectors || {}, {
+            clearIconEl: '.x-field-clear',
+            clearIconContainerEl: '.x-field-clear-container'
+        });
+        
+        Ext.form.Text.superclass.applyRenderSelectors.call(this);
+    },
+
+    initRenderData: function() {
+        var renderData     = Ext.form.Text.superclass.initRenderData.call(this),
+            autoComplete   = this.autoComplete,
+            autoCapitalize = this.autoCapitalize,
+            autoCorrect    = this.autoCorrect;
+
+        Ext.applyIf(renderData, {
+            placeHolder : this.placeHolder,
+            maxlength   : this.maxLength,
+            useClearIcon   : this.useClearIcon
+        });
+
+        var testArray = [true, 'on'];
+
+        if (autoComplete !== undefined) {
+            renderData.autoComplete = (testArray.indexOf(autoComplete) !== -1)  ? 'on': 'off';
+        }
+
+        if (autoCapitalize !== undefined) {
+            renderData.autoCapitalize = (testArray.indexOf(autoCapitalize) !== -1) ? 'on': 'off';
+        }
+
+        if (autoCorrect !== undefined) {
+            renderData.autoCorrect = (testArray.indexOf(autoCorrect) !== -1) ? 'on': 'off';
+        }
+
+        this.renderData = renderData;
+        
+        return renderData;
+    },
+
+    initEvents: function() {
+        Ext.form.Text.superclass.initEvents.call(this);
+
+        if (this.fieldEl) {
+            this.mon(this.fieldEl, {
+                focus: this.onFocus,
+                blur: this.onBlur,
+                keyup: this.onKeyUp,
+                paste: this.updateClearIconVisibility,
+                mousedown: this.onBeforeFocus,
+                scope: this
+            });
+
+            if(this.clearIconEl){
+                this.mon(this.clearIconContainerEl, {
+                    scope: this,
+                    tap: this.onClearTap
+                });
+            }
+        }
+    },
+
+    
+    onEnable: function() {
+        Ext.form.Text.superclass.onEnable.apply(this, arguments);
+
+        this.disabled = false;
+        
+        this.updateClearIconVisibility();
+    },
+
+    
+    onDisable: function() {
+        Ext.form.Text.superclass.onDisable.apply(this, arguments);
+
+        this.blur();
+        
+        this.hideClearIcon();
+    },
+
+    onClearTap: function() {
+        if (!this.disabled) {
+            this.setValue('');
+        }
+    },
+
+    updateClearIconVisibility: function() {
+        var value = this.getValue();
+
+        if (!value) {
+            value = '';
+        }
+        
+        if (value.length < 1){
+            this.hideClearIcon();
+        }
+        else {
+            this.showClearIcon();
+        }
+
+        return this;
+    },
+
+    showClearIcon: function() {
+        if (!this.disabled && this.fieldEl && this.clearIconEl && !this.isClearIconVisible) {
+            this.isClearIconVisible = true;
+            this.fieldEl.addCls('x-field-clearable');
+            this.clearIconEl.removeCls('x-hidden-visibility');
+        }
+
+        return this;
+    },
+
+    hideClearIcon: function() {
+        if (this.fieldEl && this.clearIconEl && this.isClearIconVisible) {
+            this.isClearIconVisible = false;
+            this.fieldEl.removeCls('x-field-clearable');
+            this.clearIconEl.addCls('x-hidden-visibility');
+        }
+
+        return this;
+    },
+
+    
+    afterRender: function() {
+        Ext.form.Text.superclass.afterRender.call(this);
+        this.updateClearIconVisibility();
+    },
+    
+    onBeforeFocus: function(e) {
+        this.fireEvent('beforefocus', e);
+    },
+
+    beforeFocus: Ext.emptyFn,
+
+    
+    onFocus: function(e) {
+        if (this.mask) {
+            if (this.maskCorrectionTimer) {
+                clearTimeout(this.maskCorrectionTimer);
+            }
+
+            this.hideMask();
+        }
+
+        this.beforeFocus();
+
+        if (this.focusCls) {
+            this.el.addCls(this.focusCls);
+        }
+
+        if (!this.isFocused) {
+            this.isFocused = true;
+            
+            this.startValue = this.getValue();
+            this.fireEvent('focus', this, e);
+        }
+
+    },
+
+    
+    beforeBlur: Ext.emptyFn,
+
+    
+    onBlur: function(e) {
+        this.beforeBlur();
+
+        if (this.focusCls) {
+            this.el.removeCls(this.focusCls);
+        }
+
+        this.isFocused = false;
+
+        var value = this.getValue();
+
+        if (String(value) != String(this.startValue)){
+            this.fireEvent('change', this, value, this.startValue);
+        }
+
+        this.fireEvent('blur', this, e);
+
+        this.updateClearIconVisibility();
+
+        this.showMask();
+
+        this.afterBlur();
+    },
+
+    
+    afterBlur: Ext.emptyFn,
+
+    
+    focus: function(){
+        if (this.rendered && this.fieldEl && this.fieldEl.dom.focus) {
+            this.fieldEl.dom.focus();
+        }
+
+        return this;
+    },
+
+    
+    blur: function(){
+        if(this.rendered && this.fieldEl && this.fieldEl.dom.blur) {
+            this.fieldEl.dom.blur();
+        }
+        return this;
+    },
+
+    setValue: function() {
+        Ext.form.Text.superclass.setValue.apply(this, arguments);
+
+        this.updateClearIconVisibility();
+    },
 
     onKeyUp: function(e) {
-        Ext.form.TextField.superclass.onKeyUp.apply(this, arguments);
+        this.updateClearIconVisibility();
         
         if (e.browserEvent.keyCode === 13) {
             this.blur();
-            Ext.Viewport.scrollToTop();
+        } else {
+            this.fireEvent('keyup', this, e);
         }
     }
 
     
 });
 
-Ext.reg('textfield', Ext.form.TextField);
+Ext.reg('textfield', Ext.form.Text);
 
 
-Ext.form.PasswordField = Ext.extend(Ext.form.Field, {
-    maskField: Ext.is.iOS,
+Ext.form.TextField = Ext.extend(Ext.form.Text, {
 
+    constructor: function() {
+        console.warn("Ext.form.TextField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Text instead");
+        Ext.form.TextField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+Ext.form.Password = Ext.extend(Ext.form.Text, {
     inputType: 'password',
     autoCapitalize : false
 });
 
+Ext.reg('passwordfield', Ext.form.Password);
 
 
+Ext.form.PasswordField = Ext.extend(Ext.form.Password, {
 
+    constructor: function() {
+        console.warn("Ext.form.PasswordField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Password instead");
+        Ext.form.PasswordField.superclass.constructor.apply(this, arguments);
+    }
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Ext.reg('passwordfield', Ext.form.PasswordField);
-
-Ext.form.EmailField = Ext.extend(Ext.form.TextField, {
+Ext.form.Email = Ext.extend(Ext.form.Text, {
     inputType: Ext.is.Android ? 'text' : 'email',
     
-    autoCapitalize : false
+    autoCapitalize: false
 });
 
-Ext.reg('emailfield', Ext.form.EmailField);
+Ext.reg('emailfield', Ext.form.Email);
 
 
-Ext.form.UrlField = Ext.extend(Ext.form.TextField, {
+Ext.form.EmailField = Ext.extend(Ext.form.Email, {
+
+    constructor: function() {
+        console.warn("Ext.form.EmailField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Email instead");
+        Ext.form.EmailField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+Ext.form.Url = Ext.extend(Ext.form.Text, {
     inputType: Ext.is.Android ? 'text' : 'url',
     
-    autoCapitalize : false
+    autoCapitalize: false
 });
 
-Ext.reg('urlfield', Ext.form.UrlField);
+Ext.reg('urlfield', Ext.form.Url);
 
 
-Ext.form.SearchField = Ext.extend(Ext.form.TextField, {
-    inputType: 'search'
+Ext.form.UrlField = Ext.extend(Ext.form.Url, {
+
+    constructor: function() {
+        console.warn("Ext.form.UrlField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Url instead");
+        Ext.form.UrlField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+Ext.form.Search = Ext.extend(Ext.form.Text, {
+    inputType: Ext.is.Android ? 'text' : 'search'
     
 });
 
-Ext.reg('searchfield', Ext.form.SearchField);
+Ext.reg('searchfield', Ext.form.Search);
 
 
-Ext.form.NumberField = Ext.extend(Ext.form.TextField, {
+Ext.form.SearchField = Ext.extend(Ext.form.Search, {
+
+    constructor: function() {
+        console.warn("Ext.form.SearchField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Search instead");
+        Ext.form.SearchField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+Ext.form.Number = Ext.extend(Ext.form.Text, {
+    ui: 'number',
+
     inputType: Ext.is.Android ? 'text' : 'number',
     
     minValue : undefined,
@@ -26204,9 +26463,9 @@ Ext.form.NumberField = Ext.extend(Ext.form.TextField, {
     renderTpl: [
         '<tpl if="label"><label <tpl if="fieldEl">for="{inputId}"</tpl> class="x-form-label"><span>{label}</span></label></tpl>',
         '<tpl if="fieldEl"><div class="x-form-field-container">',
-            '<input id="{inputId}" type="{type}" name="{name}" class="{fieldCls}"',
+            '<input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}"',
                 '<tpl if="tabIndex">tabIndex="{tabIndex}" </tpl>',
-                '<tpl if="placeholder">placeholder="{placeholder}" </tpl>',
+                '<tpl if="placeHolder">placeholder="{placeHolder}" </tpl>',
                 '<tpl if="style">style="{style}" </tpl>',
                 '<tpl if="minValue != undefined">min="{minValue}" </tpl>',
                 '<tpl if="maxValue != undefined">max="{maxValue}" </tpl>',
@@ -26215,32 +26474,39 @@ Ext.form.NumberField = Ext.extend(Ext.form.TextField, {
                 '<tpl if="autoCapitalize">autocapitalize="{autoCapitalize}" </tpl>',
                 '<tpl if="autoFocus">autofocus="{autoFocus}" </tpl>',
             '/>',
-            '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+            '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
             '</div></tpl>',
-        '<tpl if="showClear"><div class="x-field-clear x-hidden-display"></div></tpl>'
+        '<tpl if="useClearIcon"><div class="x-field-clear-container"><div class="x-field-clear x-hidden-visibility">&#215;</div><div></tpl>'
     ],
     
-    ui: 'number',
     
-    
-    onRender : function(ct, position) {
+    onRender : function() {
         Ext.apply(this.renderData, {
             maxValue : this.maxValue,
             minValue : this.minValue,
             stepValue : this.stepValue 
         });
-        Ext.form.NumberField.superclass.onRender.call(this, ct, position);
+        
+        Ext.form.Number.superclass.onRender.apply(this, arguments);
     }
 });
 
-Ext.reg('numberfield', Ext.form.NumberField);
+Ext.reg('numberfield', Ext.form.Number);
 
 
-Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
+Ext.form.NumberField = Ext.extend(Ext.form.Number, {
+
+    constructor: function() {
+        console.warn("Ext.form.NumberField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Number instead");
+        Ext.form.NumberField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+
+Ext.form.Spinner = Ext.extend(Ext.form.Number, {
 
     
     componentCls: 'x-spinner',
-
     
     
     minValue: Number.NEGATIVE_INFINITY,
@@ -26260,21 +26526,29 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
     
     disableInput: false,
 
+    
+    useClearIcon: false,
+
+    
+    autoCapitalize: false,
+
     renderTpl: [
         '<tpl if="label"><label <tpl if="fieldEl">for="{inputId}"</tpl> class="x-form-label"><span>{label}</span></label></tpl>',
         '<tpl if="fieldEl">',
             '<div class="{componentCls}-body">',
                 '<div class="{componentCls}-down"><span>-</span></div>',
                 '<div class="x-form-field-container">',
-                    '<input id="{inputId}" type="number" name="{name}" class="{fieldCls}"',
-                        '<tpl if="disableInput">disabled </tpl>',
+                    '<input id="{inputId}" type="{type}" name="{name}" class="{fieldCls}"',
                         '<tpl if="tabIndex">tabIndex="{tabIndex}" </tpl>',
-                        '<tpl if="placeholder">placeholder="{placeholder}" </tpl>',
+                        '<tpl if="placeHolder">placeholder="{placeHolder}" </tpl>',
                         '<tpl if="style">style="{style}" </tpl>',
-                        '<tpl if="autoFocus">autofocus="{autoFocus}" </tpl>',
+                        '<tpl if="minValue != undefined">min="{minValue}" </tpl>',
+                        '<tpl if="maxValue != undefined">max="{maxValue}" </tpl>',
+                        '<tpl if="stepValue != undefined">step="{stepValue}" </tpl>',
                         '<tpl if="autoComplete">autocomplete="{autoComplete}" </tpl>',
+                        '<tpl if="autoFocus">autofocus="{autoFocus}" </tpl>',
                     '/>',
-                    '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+                    '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
                 '</div>',
                 '<div class="{componentCls}-up"><span>+</span></div>',
             '</div>',
@@ -26283,8 +26557,10 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
     
     initComponent: function() {
         if (Ext.isDefined(this.accelerate)) {
-            throw "SpinnerField: accelerate has been removed. Please use accelerateOnTapHold.";
+            console.warn("Spinner: accelerate has been removed. Please use accelerateOnTapHold.");
+            this.accelerate = this.accelerateOnTapHold;
         }
+        
         this.addEvents(
             
             'spin',
@@ -26294,11 +26570,11 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
             'spinup'
         );
 
-        Ext.form.SpinnerField.superclass.initComponent.call(this);    
+        Ext.form.Spinner.superclass.initComponent.call(this);    
     },
 
     
-    onRender: function(ct, position) {
+    onRender: function() {
         this.renderData.disableInput = this.disableInput;
 
         Ext.applyIf(this.renderSelectors, {
@@ -26306,7 +26582,7 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
             spinDownEl: '.x-spinner-down'
         });
 
-        Ext.form.SpinnerField.superclass.onRender.call(this, ct, position);
+        Ext.form.Spinner.superclass.onRender.apply(this, arguments);
         
         this.downRepeater = this.createRepeater(this.spinDownEl, this.onSpinDown);
         this.upRepeater = this.createRepeater(this.spinUpEl, this.onSpinUp);
@@ -26321,7 +26597,7 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
             this.value = this.defaultValue;
         }
 
-        Ext.form.SpinnerField.superclass.initValue.apply(this, arguments);
+        Ext.form.Spinner.superclass.initValue.apply(this, arguments);
     },
     
     
@@ -26356,20 +26632,22 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
     },
 
     onKeyUp: function(e) {
-        var value = parseInt(this.getValue());
 
-        if (isNaN(value)) {
-            value = this.defaultValue;
-        }
 
-        this.setValue(value);
 
-        Ext.form.SpinnerField.superclass.onKeyUp.apply(this, arguments);
+
+
+
+
+
+        Ext.form.Spinner.superclass.onKeyUp.apply(this, arguments);
     },
 
     
     onTouchStart: function(btn) {
-        btn.el.addCls('x-button-pressed');
+        if (!this.disabled) {
+            btn.el.addCls('x-button-pressed');
+        }
     },
 
     
@@ -26411,44 +26689,64 @@ Ext.form.SpinnerField = Ext.extend(Ext.form.NumberField, {
     
     destroy: function() {
         Ext.destroy(this.downRepeater, this.upRepeater);
-        Ext.form.SpinnerField.superclass.destroy.call(this, arguments);
+        Ext.form.Spinner.superclass.destroy.call(this, arguments);
     }
 });
 
-Ext.reg('spinnerfield', Ext.form.SpinnerField);
+Ext.reg('spinnerfield', Ext.form.Spinner);
 
 
-Ext.form.HiddenField = Ext.extend(Ext.form.Field, {
-    inputType: 'hidden',
-    ui: 'hidden',
+Ext.form.SpinnerField = Ext.extend(Ext.form.Spinner, {
 
-    
-    
-    focus : Ext.emptyFn
+    constructor: function() {
+        console.warn("Ext.form.SpinnerField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Spinner instead");
+        Ext.form.SpinnerField.superclass.constructor.apply(this, arguments);
+    }
 });
 
-Ext.reg('hidden', Ext.form.HiddenField);
+Ext.form.Hidden = Ext.extend(Ext.form.Field, {
+    ui: 'hidden',
+    
+    inputType: 'hidden',
 
+    tabIndex: -1
+});
+
+Ext.reg('hiddenfield', Ext.form.Hidden);
+
+
+
+Ext.form.HiddenField = Ext.extend(Ext.form.Hidden, {
+
+    constructor: function() {
+        console.warn("Ext.form.HiddenField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.Hidden instead");
+        Ext.form.HiddenField.superclass.constructor.apply(this, arguments);
+    }
+});
+
+
+Ext.reg('hidden', Ext.form.Hidden);
 
 
 Ext.form.Checkbox = Ext.extend(Ext.form.Field, {
-    inputType: 'checkbox',
-    
     ui: 'checkbox',
     
-    
+    inputType: 'checkbox',
 
     
-    checked : false,
+    checked: false,
     
     
-    inputValue : undefined,
+    value: '',
 
     
     constructor: function(config) {
         this.addEvents(
             
-            'check'
+            'check',
+
+            
+            'uncheck'
         );
 
         Ext.form.Checkbox.superclass.constructor.call(this, config);
@@ -26456,140 +26754,165 @@ Ext.form.Checkbox = Ext.extend(Ext.form.Field, {
     
     renderTpl: [
         '<tpl if="label"><label <tpl if="fieldEl">for="{inputId}"</tpl> class="x-form-label"><span>{label}</span></label></tpl>',
-        '<tpl if="fieldEl"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}" ',
-            '<tpl if="tabIndex">tabIndex="{tabIndex}" </tpl>',
+        '<tpl if="fieldEl"><input id="{inputId}" type="{inputType}" name="{name}" class="{fieldCls}" tabIndex="-1" ',
             '<tpl if="checked"> checked </tpl>',
             '<tpl if="style">style="{style}" </tpl> value="{inputValue}" />',
         '</tpl>'
     ],
 
     
-    onRender : function(ct, position) {
-        var me = this;
-        
-        Ext.apply(me.renderData, {
-            inputValue : me.inputValue || me.value || '',
-            checked    : (['true', '1', 'on'].indexOf(me.checked) !== -1)
+    onRender: function() {
+        var isChecked = this.getBooleanIsChecked(this.checked);
+
+        Ext.apply(this.renderData, {
+            inputValue  : this.value || '',
+            checked     : isChecked
         });
 
         Ext.form.Checkbox.superclass.onRender.apply(this, arguments);
 
-        if (me.fieldEl) {
-            me.mon(me.fieldEl, {
-                change: me.onChange,
-                scope: me
+        if (this.fieldEl) {
+            this.mon(this.fieldEl, {
+                change: this.onChange,
+                scope: this
             });
 
-	        me.setValue(me.checked);
+            this.setChecked(isChecked);
+            this.originalState = this.isChecked();
         }
-
     },
     
     
-    onChange : function() {
-        this.fireEvent('check', this, this.getValue());
+    onChange: function() {
+        if (this.isChecked()) {
+            this.fireEvent('check', this);
+        } else {
+            this.fireEvent('uncheck', this);
+        }
     },
 
     
-    getValue : function(){
-        if (this.rendered) {
-            return this.fieldEl.dom.checked || false;
-        }
-        return this.checked || false;
+    isChecked: function() {
+        return this.fieldEl.dom.checked || false;
     },
 
     
-    setValue : function(v) {
-        var checked = this.getValue();
-        
-        this.checked = /^(true|1|on)/i.test(String(v));
-        
-        if (this.rendered) {
-            this.fieldEl.dom.checked = this.fieldEl.dom.defaultChecked = this.checked;
-        }
+    setChecked: function(checked) {
+        this.fieldEl.dom.checked = this.getBooleanIsChecked(checked);
 
-        if (checked != this.checked) {
-            this.onChange();
-        }
+        return this;
     },
 
-        
-    setInputValue : function(inputValue) {
-        this.inputValue = inputValue;
-        if (this.rendered) {
-            this.fieldEl.dom.value = inputValue;
-        }
+    
+    check: function() {
+        return this.setChecked(true);
     },
 
+    
+    uncheck: function() {
+        return this.setChecked(false);
+    },
+
+    
+    reset: function() {
+        Ext.form.Checkbox.superclass.reset.apply(this, arguments);
         
-    getInputValue : function() {
-        return this.rendered ? this.fieldEl.dom.value : (this.inputValue || this.value);
+        this.setChecked(this.originalState);
+
+        return this;
+    },
+
+    //@private
+
+    getBooleanIsChecked: function(value) {
+        return /^(true|1|on)/i.test(String(value));
+    },
+
+    getSameGroupFields: function() {
+        var parent = this.el.up('form'),
+            formComponent = Ext.getCmp(parent.id),
+            fields = [];
+
+        if (formComponent) {
+            fields = formComponent.getFields(this.getName());
+        }
+
+        return fields;
+    },
+
+    
+    getGroupValues: function() {
+        var values = [];
+
+        this.getSameGroupFields().forEach(function(field) {
+            if (field.isChecked()) {
+                values.push(field.getValue());
+            }
+        });
+
+        return values;
+    },
+
+    
+    setGroupValues: function(values) {
+        this.getSameGroupFields().forEach(function(field) {
+            field.setChecked((values.indexOf(field.getValue()) !== -1));
+        });
+        
+        return this;
     }
 });
 
-Ext.reg('checkbox', Ext.form.Checkbox);
+Ext.reg('checkboxfield', Ext.form.Checkbox);
 
+
+Ext.reg('checkbox', Ext.form.Checkbox);
 
 Ext.form.Radio = Ext.extend(Ext.form.Checkbox, {
     inputType: 'radio',
+    
     ui: 'radio',
+    
     
 
     
     getGroupValue: function() {
-        var parent = this.el.up('form') || Ext.getBody(),
-            radios = parent.select('input[name=' + this.fieldEl.dom.name + ']', true),
-            checkedRadio;
-            
-        radios.each(function(radio) {
-            if (radio.dom.checked) {
-                checkedRadio = radio;
-                return false;
+        var field,
+            fields = this.getSameGroupFields();
+
+        for (var i=0; i<fields.length; i++) {
+            field = fields[i];
+
+            if (field.isChecked()) {
+                return field.getValue();
             }
-        });
-        
-        return checkedRadio && checkedRadio.dom ? checkedRadio.dom.value: null;
+        }
+
+        return null;
     },
 
     
-    setValue: function(value) {
-        if (typeof value == 'boolean') {
-            Ext.form.Radio.superclass.setValue.call(this, value);
-        } 
-        else if (this.rendered && value != undefined) {
-            var radio = this.findMatchingRadio(value),
-                wrap = radio ? radio.up('.' + this.renderData.baseCls) : null;
-            if (wrap) {
-                Ext.getCmp(wrap.id).setValue(true);
-            }
-        }
-    },
-    
-    
-    findMatchingRadio: function(value) {
-        var checkEl;
-        this.getCheckEl().select('input[name=' + this.fieldEl.dom.name + ']').each(function(el) {
-            if (el.dom.value == value) {
-                checkEl = el.dom;
-                return false;
-            }
-        });
-        return Ext.get(checkEl);
-    },
+    setGroupValue: function(value) {
+        var field,
+            fields = this.getSameGroupFields();
 
-    
-    getCheckEl: function() {
-        if (this.inGroup) {
-            return this.el.up('.x-form-radio-group');
+        for (var i=0; i<fields.length; i++) {
+            field = fields[i];
+
+            if (field.getValue() == value) {
+                field.check();
+                return;
+            }
         }
-        return this.el.up('form') || Ext.getBody();
     }
 });
+
+Ext.reg('radiofield', Ext.form.Radio);
+
+
 Ext.reg('radio', Ext.form.Radio);
 
-
-Ext.form.Select = Ext.extend(Ext.form.TextField, {
-
+Ext.form.Select = Ext.extend(Ext.form.Text, {
     ui: 'select',
     
 
@@ -26603,33 +26926,27 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
 
     
     
-    maskField: true,
-
-    
-    prependText: '',
-    
-    
-    hiddenName: '',
-
     
     tabIndex: -1,
 
     
+    useMask: true,
+    
+    
     initComponent: function() {
-        
-        this.label = this.label || this.fieldLabel;
+        var options = this.options;
 
-        var options    = this.options,
-            ln         = options && options.length;
-
-        if (options && Ext.isArray(options) && ln) {
-            this.store = new Ext.data.Store({
-                model: 'x-textvalue',
-                data: options
-            });
-        }
-        else if (this.store) {
+        if (this.store) {
             this.store = Ext.StoreMgr.lookup(this.store);
+        }
+        else {
+            this.store = new Ext.data.Store({
+                fields: [this.valueField, this.displayField]
+            });
+
+            if (options && Ext.isArray(options) && options.length > 0) {
+                this.setOptions(this.options);
+            }
         }
 
         Ext.form.Select.superclass.initComponent.call(this);
@@ -26638,20 +26955,6 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
             
             'change'
         );
-    },
-    
-    onRender: function() {
-        var name = this.hiddenName;
-            
-        Ext.form.Select.superclass.onRender.apply(this, arguments);
-        
-        if (name) {
-            this.hiddenField = this.el.insertSibling({
-                name: name,
-                tag: 'input',
-                type: 'hidden'
-            }, 'after', true);
-        }
     },
 
     getPicker: function() {
@@ -26682,10 +26985,12 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
                 stopMaskTapEvent : true,
                 hideOnMaskTap    : true,
                 cls              : 'x-select-overlay',
+                scroll           : 'vertical',
                 items: {
                     xtype: 'list',
                     store: this.store,
                     itemId: 'list',
+                    scroll: false,
                     itemTpl : [
                         '<span class="x-list-label">{' + this.displayField + '}</span>',
                         '<span class="x-list-selected"></span>'
@@ -26744,31 +27049,31 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
             this.fireEvent('change', this, newValue);
         }
     },
+
     
-    getValue: function() {
-        return this.value;
-    },
-
-    initValue: function() {
-        this.setValue(this.value);
-        this.originalValue = this.getValue();
-    },
-
-    setValue: function(v) {
-        var record = v ? this.store.findRecord(this.valueField, v): this.store.getAt(0),
-            hidden = this.hiddenField;
+    setValue: function(value) {
+        var record = value ? this.store.findRecord(this.valueField, value) : this.store.getAt(0);
 
         if (record && this.rendered) {
-            this.fieldEl.dom.value = this.prependText + ' ' + record.get(this.displayField);
+            this.fieldEl.dom.value = record.get(this.displayField);
             this.value = record.get(this.valueField);
         } else {
-            this.value = v;
+            this.value = value;
+        }
+
+        
+        if (this.picker) {
+            var pickerValue = {};
+            pickerValue[this.name] = this.value;
+            this.picker.setValue(pickerValue);
         }
         
-        if (hidden) {
-            hidden.value = this.value;
-        }
         return this;
+    },
+
+    
+    getValue: function(){
+        return this.value;
     },
 
     
@@ -26795,10 +27100,14 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
     }
 });
 
+Ext.reg('selectfield', Ext.form.Select);
+
+
 Ext.reg('select', Ext.form.Select);
 
-Ext.form.TextArea = Ext.extend(Ext.form.TextField, {
-    maskField: Ext.is.iOS,
+Ext.form.TextArea = Ext.extend(Ext.form.Text, {
+    ui: 'textarea',
+
     
     maxRows: undefined,
     
@@ -26817,90 +27126,107 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField, {
             '<tpl if="autoCapitalize">autocapitalize="{autoCapitalize}" </tpl>',
             '<tpl if="autoFocus">autofocus="{autoFocus}" </tpl>',
             '></textarea>',
-            '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+            '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
         '</div></tpl>'
     ],
-    
-    ui: 'textarea',
     
     
     onRender: function() {
         this.renderData.maxRows = this.maxRows;
+        
         Ext.form.TextArea.superclass.onRender.apply(this, arguments);
     }
 });
 
+Ext.reg('textareafield', Ext.form.TextArea);
+
+
 Ext.reg('textarea', Ext.form.TextArea);
 
 
-Ext.form.DatePickerField = Ext.extend(Ext.form.Field, {
+Ext.form.DatePicker = Ext.extend(Ext.form.Field, {
     ui: 'select',
     
     
     picker: null,
+
     
+
     
-    maskField: true,
+    destroyPickerOnHide: false,
+
     
+    tabIndex: -1,
+
     
+    useMask: true,
     
     
     initComponent: function() {
-        this.tabIndex = -1;
-        Ext.form.DatePickerField.superclass.initComponent.apply(this, arguments);
+        this.addEvents(
+            
+            'select'
+        );
+
+        Ext.form.Text.superclass.initComponent.apply(this, arguments);
     },
+
     
+    getDatePicker: function() {
+        if (!this.datePicker) {
+            if (this.picker instanceof Ext.DatePicker) {
+                this.datePicker = this.picker;
+            } else {
+                this.datePicker = new Ext.DatePicker(Ext.apply(this.picker || {}));
+            }
+
+            this.datePicker.setValue(this.value || null);
+
+            this.datePicker.on({
+                scope : this,
+                change: this.onPickerChange,
+                hide  : this.onPickerHide
+            });
+        }
+
+        return this.datePicker;
+    },
+
     
     onMaskTap: function() {
         if (this.disabled) {
             return;
         }
         
-        var me     = this,
-            config = Ext.apply(me.picker || {}, {
-                value: me.value || null,
-            
-                listeners: {
-                    scope : me,
-                    change: me.onPickerChange,
-                    hide  : me.onPickerHide
-                }
-            });
-        
-        me.datePicker = new Ext.DatePicker(config);
-        me.datePicker.show();
+        this.getDatePicker().show();
     },
     
     
     onPickerChange : function(picker, value) {
-        var me = this;
-        
-        me.setValue(value);
-        me.fireEvent('select', me, me.getValue());
+        this.setValue(value);
+        this.fireEvent('select', this, this.getValue());
     },
     
     
-    onPickerHide : function() {
-        this.datePicker.destroy();
+    onPickerHide: function() {
+        if (this.destroyPickerOnHide && this.datePicker) {
+            this.datePicker.destroy();
+        }
     },
 
     
-    setValue: function(value) {
-        var me = this;
-        
-        if (Ext.isDate(value)) {
-            me.value = value;
-        } else if (Ext.isObject(value)) {
-            me.value = new Date(value.year, value.month - 1, value.day);
-        } else {
-            me.value = null;
+    setValue: function(value, animated) {
+        var datePicker = this.getDatePicker();
+
+        datePicker.setValue(value, animated);
+
+        this.value = datePicker.getValue();
+
+        if (this.rendered) {
+            this.fieldEl.dom.value = this.getValue(true);
         }
         
-        if (me.rendered) {
-            me.fieldEl.dom.value = value ? me.getValue(true) : null;
-        }
-        
-        return me;
+        return this;
     },
     
     
@@ -26911,12 +27237,24 @@ Ext.form.DatePickerField = Ext.extend(Ext.form.Field, {
     
     
     onDestroy: function() {
-        if (this.datePicker) this.datePicker.destroy();
-        Ext.form.DatePickerField.superclass.onDestroy.call(this);
+        if (this.datePicker) {
+            this.datePicker.destroy();
+        }
+        
+        Ext.form.DatePicker.superclass.onDestroy.call(this);
     }
 });
 
-Ext.reg('datepickerfield', Ext.form.DatePickerField);
+Ext.reg('datepickerfield', Ext.form.DatePicker);
+
+
+Ext.form.DatePickerField = Ext.extend(Ext.form.DatePicker, {
+
+    constructor: function() {
+        console.warn("Ext.form.DatePickerField has been deprecated and will be removed in Sencha Touch 1.0. Please use Ext.form.DatePicker instead");
+        Ext.form.DatePickerField.superclass.constructor.apply(this, arguments);
+    }
+});
 
 
 Ext.layout.LayoutManager = new Ext.AbstractManager({
@@ -27226,72 +27564,68 @@ Ext.layout.DockLayout = Ext.extend(Ext.layout.ComponentLayout, {
 
         
         if (height === undefined || height === null || width === undefined || width === null || contracted) {
-            if ((height === undefined && width === undefined) && (ownerCt && ownerCt.layout && (ownerCt.layout.type != 'autocontainer' && ownerCt.layout.type != 'box'))) {
+            
+            if ((height === undefined || height === null) && (width === undefined || width === null)) {
+                autoHeight = true;
+                autoWidth = true;
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(null, null);
+                }
+                me.setBodyBox({width: null, height: null});
+            }
+            
+            else if (height === undefined || height === null) {
+                autoHeight = true;
+                
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(width, null);
+                }
+                me.setBodyBox({width: width, height: null});
+            
             }
             else {
+                autoWidth = true;
                 
-                if ((height === undefined || height === null) && (width === undefined || width === null)) {
-                    autoHeight = true;
-                    autoWidth = true;
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(null, null);
-                    }
-                    me.setBodyBox({width: null, height: null});
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(null, height);
                 }
-                
-                else if (height === undefined || height === null) {
-                    autoHeight = true;
-                    
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(width, null);
-                    }
-                    me.setBodyBox({width: width, height: null});
-                
-                }
-                else {
-                    autoWidth = true;
-                    
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(null, height);
-                    }
-                    me.setBodyBox({width: null, height: height});
-                }
+                me.setBodyBox({width: null, height: height});
+            }
 
-                
-                if (!collapsed && layout && layout.isLayout) {
-                    layout.layout();
-                }
+            
+            if (!collapsed && layout && layout.isLayout) {
+                layout.layout();
+            }
 
-                
-                
-                
-                
-                
-                me.dockItems(autoWidth, autoHeight);
-                if (collapsed) {
-                    if (headerItem) {
-                        if (headerItem.dock == 'top' || headerItem.dock == 'bottom') {
-                            info.size.height = headerItem.getHeight();
-                        }
-                        else {
-                            info.size.width = headerItem.getWidths();
-                        }
-                    } else {
-                        info.size.height = 0;
-                    }
-                }
-                if (expanded || contracted) {
-                    if (owner.animCollapse) {
-                        Ext.createDelegate(owner.animCollapseFn, owner, [info.size.width, info.size.height])();
+            
+            
+            
+            
+            
+            me.dockItems(autoWidth, autoHeight);
+            if (collapsed) {
+                if (headerItem) {
+                    if (headerItem.dock == 'top' || headerItem.dock == 'bottom') {
+                        info.size.height = headerItem.getHeight();
                     }
                     else {
-                        Ext.createDelegate(owner['after' + (expanded ? 'Expand' : 'Collapse')], owner)();
-                        me.setTargetSize(info.size.width, info.size.height);
+                        info.size.width = headerItem.getWidths();
                     }
+                } else {
+                    info.size.height = 0;
+                }
+            }
+            if (expanded || contracted) {
+                if (owner.animCollapse) {
+                    Ext.createDelegate(owner.animCollapseFn, owner, [info.size.width, info.size.height])();
                 }
                 else {
+                    Ext.createDelegate(owner['after' + (expanded ? 'Expand' : 'Collapse')], owner)();
                     me.setTargetSize(info.size.width, info.size.height);
                 }
+            }
+            else {
+                me.setTargetSize(info.size.width, info.size.height);
             }
         }
         else {
@@ -28078,7 +28412,7 @@ Ext.layout.BoxLayout = Ext.extend(Ext.layout.ContainerLayout, {
 
 
 Ext.layout.HBoxLayout = Ext.extend(Ext.layout.BoxLayout, {
-    orientation: 'horizontal',
+    orientation: 'horizontal'
     
     
     
@@ -28098,5 +28432,6 @@ Ext.layout.VBoxLayout = Ext.extend(Ext.layout.BoxLayout, {
 });
 
 Ext.regLayout('vbox', Ext.layout.VBoxLayout);
+
 
 

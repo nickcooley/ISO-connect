@@ -49,12 +49,12 @@ Ext.Container = Ext.extend(Ext.lib.Container, {
             });
         }
         
-        //<debug>
+        //<deprecated since="0.99">
         if (Ext.isDefined(this.animation)) {
-            throw new Error("Container: animation has been removed. Please use cardSwitchAnimation.");
+            console.warn("Container: animation has been removed. Please use cardSwitchAnimation.");
             this.cardSwitchAnimation = this.animation;
         }
-        //</debug>
+        //</deprecated>
 
         Ext.Container.superclass.initComponent.apply(this, arguments);
     },
@@ -93,9 +93,10 @@ Ext.Container = Ext.extend(Ext.lib.Container, {
     handleFieldEventListener: function(isAdding, item) {
         if (!this.fieldEventWrap)
             this.fieldEventWrap = {};
-
+            
+        //TODO: remove the 'textarea' xtype here for the release of 1.0. This is a backwards-compatibility xtype only
         if (['textfield', 'passwordfield', 'emailfield',
-             'textarea', 'searchfield', 'urlfield', 'numberfield', 'spinnerfield'].indexOf(item.xtype) !== -1) {
+             'textarea', 'textareafield', 'searchfield', 'urlfield', 'numberfield', 'spinnerfield'].indexOf(item.xtype) !== -1) {
             if (isAdding) {
                 this.fieldEventWrap[item.id] = {
                     beforefocus: function(e) {this.onFieldBeforeFocus(item, e);},

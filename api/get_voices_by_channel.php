@@ -11,28 +11,6 @@ require($_SERVER['DOCUMENT_ROOT'] . '/lib/helpers.php');
 
 check_required_get_params(array('cid' => 'numeric'));
 
-if ($_GET['cid'] == 0 || (isset($_GET['filter']) && $_GET['filter'] == 'attendees')) {
-	$cache_time_secs = 120;
-}
-else {
-	$cache_time_secs = 30;
-}
-
-$do_cache = TRUE;
-if ($do_cache) {
-	$attendee = (isset($_GET['filter']) && $_GET['filter'] == 'attendees') ? '-attendees' : '';
-	$root = $_SERVER['DOCUMENT_ROOT'];
-	$cachefile = $root . '/cache_dave/' . basename($_SERVER['PHP_SELF'], '.php');
-	$cachefile .=  ".chan-{$_GET['cid']}{$attendee}.cache";
-	clearstatcache();
-	if (file_exists($cachefile)) { //good to serve!
-		error_log("Using the new cache file");
-		include($cachefile);
-		exit;
-	}
-	ob_start();
-}
-
 $mysqli = new mysqli(DBHOST, DBUSER, DBPASS, DB);
 if (mysqli_connect_error()) {
 	$message = 'database error ' . mysqli_connect_errno() . ': ' . mysqli_connect_error();
@@ -45,15 +23,13 @@ $chanzero_op = ($_GET['cid'] == 0) ? 'OR' : 'AND';
 $chanzero = ($_GET['cid'] == 0) ? 'OR screen_name IN (SELECT screen_name FROM attendee) ' : '';
 
 if (isset($_GET['filter']) && $_GET['filter'] == 'attendees') {
-	$stmt = $mysqli->prepare('SELECT status.screen_name, profile_image_url, COUNT(status.screen_name) as qty FROM status
-		INNER JOIN status_channel ON status.id = status_channel.status_id
-		WHERE status_channel.channel_id = ? ' . $chanzero_op . ' status.screen_name IN (SELECT screen_name FROM attendee)
+	$stmt = $mysqli->prepare('SELECT screen_name, profile_image_url, count as qty FROM voices_latest
+		WHERE channel_id = ? ' . $chanzero_op . ' screen_name IN (SELECT screen_name FROM attendee)
 		GROUP BY screen_name ORDER BY qty DESC LIMIT 50');
 }
 else {
-	$stmt = $mysqli->prepare('SELECT screen_name, profile_image_url, COUNT(screen_name) as qty FROM status
-		INNER JOIN status_channel ON status.id = status_channel.status_id
-		WHERE status_channel.channel_id = ? ' . $chanzero . '
+	$stmt = $mysqli->prepare('SELECT screen_name, profile_image_url, COUNT(screen_name) as qty FROM voices_latest
+		WHERE channel_id = ? ' . $chanzero . '
 		GROUP BY screen_name
 		ORDER BY qty DESC LIMIT 50');
 }
@@ -75,14 +51,4 @@ $stmt->close();
 $return_array = array('users' => $users);
 print to_json($return_array);
 
-if ($do_cache) {
-	$contents = ob_get_contents();
-	ob_end_clean();
-
-	$handle = fopen($cachefile, 'w');
-	fwrite($handle, $contents);
-	fclose($handle);
-
-	include($cachefile);
-}
 ?>

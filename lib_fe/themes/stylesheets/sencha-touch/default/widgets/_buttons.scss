@@ -7,13 +7,16 @@
 $button_height: 1.8em;
 $button_radius: .4em;
 $button_stroke_weight: .1em;
+$button_gradient: $base_gradient !default;
 
-$button_gradient: 'matte';
+$toolbar_icon_size: 1.4em !default;
 
-@mixin button_mask_icon($name) {
+$include_button_uis: $include_default_uis !default;
+
+@mixin pictos-button-iconmask($name) {
   @if $name {
     .x-button img.x-icon-mask.#{$name} {
-      -webkit-mask-box-image: theme_image($theme_name, "toolbaricons/" + $name + ".png");
+      -webkit-mask: theme_image($theme_name, "pictos/" + $name + ".png");
     }
   }
 }
@@ -43,6 +46,7 @@ $button_gradient: 'matte';
       &.x-icon-mask {
         width: 1.3em;
         height: 1.3em;
+        -webkit-mask-size: 1.3em;
       }
     }
     
@@ -116,22 +120,24 @@ $button_gradient: 'matte';
   }
   
   // Back/Forward buttons
-  $shadow_width: .06em; // Space between tip and its shadow
+  $shadow_width: .065em; // Space between tip and its shadow
   $overlap_width: .2em; // how far the mask is clipped
 
-  $mask_height: $button_height; // Ugh, this is non-specific... borders?
+  $mask_height: $button_height + $button_stroke_weight * 2; // Ugh, this is non-specific... borders?
   $mask_width: $mask_height/2.33;
 
-  $mask_offset: $button_radius - $overlap_width - $button_stroke_weight + $shadow_width;
+  $mask_offset: $button_radius - $overlap_width - $button_stroke_weight + $shadow_width - .02em;
   
-  $tip_width: $mask_width - $mask_offset + $shadow_width/2 + $shadow_width;
+  $tip_width: $mask_width - $mask_offset + $shadow_width;
 
   .x-button-forward, .x-button-back {
     position: relative;
     overflow: visible;
     height: $mask_height;
+    z-index: 1;
     &:before, &:after {
       @include insertion($mask_width, $mask_height, -$button_stroke_weight, auto);
+      z-index: 2;
       -webkit-mask: $mask_offset 0 theme_image($theme_name, "tip.png") no-repeat;
       -webkit-mask-size: $mask_width $mask_height;
       overflow: hidden;
@@ -143,7 +149,6 @@ $button_gradient: 'matte';
     padding-left: .4em;
     &:before {
       left: - $tip_width;
-      background: rgba(0,0,0,.8);
     }
     &:after {
       left: - $tip_width + $shadow_width;
@@ -153,12 +158,13 @@ $button_gradient: 'matte';
   .x-button-forward, .x-toolbar .x-button-forward {
     margin-right: $tip_width - $shadow_width + $toolbar_spacing;      
     padding-right: .4em;
+    &:before, &:after {
+      -webkit-mask: -$mask_offset 0 theme_image($theme_name, "tip_right.png") no-repeat;
+    }
     &:before {
-      -webkit-transform: rotateY(180deg);
       right: - $tip_width;
     }
     &:after {
-      -webkit-transform: rotateY(180deg);
       right: - $tip_width + $shadow_width;
     }
   }
@@ -185,8 +191,9 @@ $button_gradient: 'matte';
     }
   
     img {
-      width: 1.5em;
-      height: 1.5em;
+      -webkit-mask-size: $toolbar_icon_size;
+      width: $toolbar_icon_size;
+      height: $toolbar_icon_size;
     }
   
     &.x-button-pressed {
@@ -216,17 +223,6 @@ $button_gradient: 'matte';
     &:not(:first-child) {
       border-left: 0;
     }
-  }
-
-  // Disclosure icons
-  
-  $disclosure_size: 1em;
-  
-  .x-disclosure {
-    -webkit-mask-box-image: theme_image($theme_name, "disclosure.png");
-    @include bg_gradient(saturate($active_color, 10%));
-    width: 30px;
-    height: 30px;
   }
   
   // Badges
@@ -264,37 +260,39 @@ $button_gradient: 'matte';
     }
   }
   
-  @if $include_all_icons {
-    @include button_mask_icon('action');
-    @include button_mask_icon('add');
-    @include button_mask_icon('arrow_down');
-    @include button_mask_icon('arrow_left');
-    @include button_mask_icon('arrow_right');
-    @include button_mask_icon('arrow_up');
-    @include button_mask_icon('compose');
-    @include button_mask_icon('delete');
-    @include button_mask_icon('organize');
-    @include button_mask_icon('refresh');
-    @include button_mask_icon('reply');
-    @include button_mask_icon('search');
-    @include button_mask_icon('settings');
-    @include button_mask_icon('star');
-    @include button_mask_icon('trash');
-    @include button_mask_icon('maps');
-    @include button_mask_icon('locate');
-    @include button_mask_icon('home');
-    @include button_mask_icon('info');
+  @if $include_default_icons {
+    @include pictos-button-iconmask('action');
+    @include pictos-button-iconmask('add');
+    @include pictos-button-iconmask('arrow_down');
+    @include pictos-button-iconmask('arrow_left');
+    @include pictos-button-iconmask('arrow_right');
+    @include pictos-button-iconmask('arrow_up');
+    @include pictos-button-iconmask('compose');
+    @include pictos-button-iconmask('delete');
+    @include pictos-button-iconmask('organize');
+    @include pictos-button-iconmask('refresh');
+    @include pictos-button-iconmask('reply');
+    @include pictos-button-iconmask('search');
+    @include pictos-button-iconmask('settings');
+    @include pictos-button-iconmask('star');
+    @include pictos-button-iconmask('trash');
+    @include pictos-button-iconmask('maps');
+    @include pictos-button-iconmask('locate');
+    @include pictos-button-iconmask('home');
+    @include pictos-button-iconmask('info');
   }
   
   // @include sencha-button-ui('normal', #ccc);
-  @include sencha-button-ui('action', $active_color);
-  @include sencha-button-ui('confirm', desaturate(darken($bright_color, 10%), 5%));
-  @include sencha-button-ui('decline', desaturate(darken($alert_color, 10%), 5%));
+  @if $include_button_uis {
+    @include sencha-button-ui('action', $active_color);
+    @include sencha-button-ui('confirm', desaturate(darken($bright_color, 10%), 5%));
+    @include sencha-button-ui('decline', desaturate(darken($alert_color, 10%), 5%));
+  }
 }
 
 @mixin sencha-button-ui($ui_label, $color, $gradient: $button_gradient) {
   .x-button.x-button-#{$ui_label}, .x-button.x-button-#{$ui_label}-round, .x-button.x-button-#{$ui_label}-small {
-    @include toolbar_button($color);
+    @include toolbar_button($color, $gradient);
   }
   
   .x-button.x-button-#{$ui_label}-round {

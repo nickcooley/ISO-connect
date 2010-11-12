@@ -212,7 +212,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
             return this.title || this.backText;
         // <debug>
         } else {
-            throw "No RecordNode passed into renderTitleText";
+            throw new Error("No RecordNode passed into renderTitleText");
         }
         // </debug>
     },
@@ -477,7 +477,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
             // <debug>
             var rootNode = itemsArray[0].recordNode;
             if (rootNode.id !== pathArr[0]) {
-                throw "rootNode doesn't match!";
+                throw new Error("rootNode doesn't match!");
             }
             // </debug>
 
@@ -506,7 +506,7 @@ Ext.NestedList = Ext.extend(Ext.Panel, {
 
         // <debug>
         if (!lastCard) {
-            throw "Card was not found when trying to add to NestedList.";
+            throw new Error("Card was not found when trying to add to NestedList.");
         }
         // </debug>
 

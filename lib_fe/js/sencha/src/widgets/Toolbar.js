@@ -2,24 +2,30 @@
  * @class Ext.Toolbar
  * @extends Ext.Container
  *
- * Toolbars are most commonly used as dockedItems within an Ext.Panel. They can
- * be docked at the 'top' or 'bottom' of a Panel by specifying the dock config.
+ * <p>Toolbars are most commonly used as dockedItems within an Ext.Panel. They can
+ * be docked at the 'top' or 'bottom' of a Panel by specifying the dock config.</p>
  *
- * The defaultType of Toolbar's is 'button'.
- *
+ * <p>The {@link #defaultType} of Toolbar's is '{@link Ext.Button button}'.</p>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Toolbar/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
 var myToolbar = new Ext.Toolbar({
-    dock: 'top',
+    dock : 'top',
     title: 'My Toolbar',
-    items: [{
-        text: 'My Button'
-    }]
+    items: [
+        {
+            text: 'My Button'
+        }
+    ]
 });
 
 var myPanel = new Ext.Panel({
     dockedItems: [myToolbar],
-    fullscreen: true,
-    html: 'Test Panel'
+    fullscreen : true,
+    html       : 'Test Panel'
 });</code></pre>
  * @xtype toolbar
  */

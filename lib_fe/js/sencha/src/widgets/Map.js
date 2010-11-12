@@ -6,19 +6,22 @@
  * http://code.google.com/apis/maps/documentation/v3/introduction.html</p>
  *
  * <p>To use this component you must include an additional JavaScript file from
- * Google.</p>
- *
- * <pre><code>
-&lt;script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"&gt;&lt/script&gt;</code></pre>
- *
- * An example of using the Map component:
+ * Google:</p>
+ * <pre><code>&lt;script type="text/javascript" src="http:&#47;&#47;maps.google.com/maps/api/js?sensor=true"&gt;&lt/script&gt;</code></pre>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Map/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
 var pnl = new Ext.Panel({
     fullscreen: true,
-    items: [{
-        xtype: 'map',
-        useCurrentLocation: true
-    }]
+    items     : [
+        {
+            xtype             : 'map',
+            useCurrentLocation: true
+        }
+    ]
 });</code></pre>
  * @xtype map
  */
@@ -71,12 +74,12 @@ Ext.Map = Ext.extend(Ext.Component, {
         
         this.scroll = false;
         
-        //<debug>
+        //<deprecated since="0.99">
         if (Ext.isDefined(this.getLocation)) {
-            throw "SpinnerField: getLocation has been removed. Please use useCurrentLocation.";
+            console.warn("SpinnerField: getLocation has been removed. Please use useCurrentLocation.");
             this.useCurrentLocation = this.getLocation;
         }
-        //</debug>
+        //</deprecated>
         
         if(!(window.google || {}).maps){
             this.html = 'Google Maps API is required';   

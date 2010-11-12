@@ -298,7 +298,7 @@ Ext.Element.select = function(selector, root, composite) {
     } else if (selector.length !== undefined) {
         els = selector;
     } else {
-        throw "Invalid selector";
+        throw new Error("Invalid selector");
     }
     return composite ? new Ext.CompositeElement(els) : els;
 };

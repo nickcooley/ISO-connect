@@ -92,7 +92,7 @@ Ext.DataView.override({
     addCmpEvents: function() {
         //<deprecated since=0.99>
         if (Ext.isDefined(this.forceSelection)) {
-            throw "DataView: forceSelection has been replaced by allowDeselect.";
+            throw new Error("DataView: forceSelection has been replaced by allowDeselect.");
         }
         //</deprecated>
 

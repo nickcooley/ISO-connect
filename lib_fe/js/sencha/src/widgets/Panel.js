@@ -12,22 +12,48 @@
  * child components, appending them one after the other inside the Container, and <b>does not apply any sizing</b>
  * at all.</p>
  * 
- * <p>Example usage:</p>
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #fullscreen}</li>
+ *   <li>{@link #layout}</li>
+ *   <li>{@link #items}</li>
+ *   <li>{@link #dockedItems}</li>
+ *   <li>{@link #html}</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #show}</li>
+ *   <li>{@link #hide}</li>
+ *   <li>{@link #showBy}</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Panel/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
-var pnl = new Ext.Panel({
+var panel = new Ext.Panel({
     fullscreen: true,
-    dockedItems: [{
-        dock: 'top',
-        xtype: 'toolbar',
-        title: 'Standard Titlebar'
-    },{
-        dock: 'top',
-        xtype: 'toolbar',
-        type: 'light',
-        items: [{
-            text: 'Test Button'
-        }]
-    }],
+    
+    dockedItems: [
+        {
+            dock : 'top',
+            xtype: 'toolbar',
+            title: 'Standard Titlebar'
+        },
+        {
+            dock : 'top',
+            xtype: 'toolbar',
+            ui   : 'light',
+            items: [
+                {
+                    text: 'Test Button'
+                }
+            ]
+        }
+    ],
+    
     html: 'Testing'
 });</code></pre>
  * 

@@ -2,22 +2,36 @@
 /**
  * @class Ext.SegmentedButton
  * @extends Ext.Container
- * <p>SegmentedButton is a container for a group of {@link Ext.Button}s. Example usage:</p>
+ * <p>SegmentedButton is a container for a group of {@link Ext.Button}s. Generally a SegmentedButton would be 
+ * a child of a {@link Ext.Toolbar} and would be used to switch between different views.</p>
+ * 
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #allowMultiple}</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.SegmentedButton/screenshot.png" /></p>
+ * 
+ * <h2>Example usage:</h2>
  * <pre><code>
 var segmentedButton = new Ext.SegmentedButton({
     allowMultiple: true,
-    items: [{
-        text: 'Option 1',
-        pressed: true
-    },{
-        text: 'Option 2',
-        handler: tappedFn
-    },{
-        text: 'Option 3',
-        pressed: true
-    }],
-    listeners : {
-        toggle : function(container, button, pressed){
+    items: [
+        {
+            text: 'Option 1'
+        },
+        {
+            text   : 'Option 2',
+            pressed: true,
+            handler: tappedFn
+        },
+        {
+            text: 'Option 3'
+        }
+    ],
+    listeners: {
+        toggle: function(container, button, pressed){
             console.log("User toggled the '" + button.text + "' button: " + (pressed ? 'on' : 'off'));
         }
     }

@@ -13,6 +13,144 @@
 
 <div id="releases">
     <div class="release">
+        <h1>Release Notes for Sencha Touch RC1</h1>
+        
+        <p class="notes">Release Notes: November 8, 2010<br />
+         Version Number: 1.0RC1</p>
+        
+        <p class="notes"><strong><a href="http://www.sencha.com/products/touch/thank-you.php?dl=rc1">Download Sencha Touch RC1</a></strong></p><!-- Only include download link for the current release -->
+        
+        <p>
+            This release forms the first Release Candidate for Sencha Touch. We expect this release to comprise the final set of API changes before Sencha Touch 1.0 (see
+            the API Changes section below).
+        </p>
+        
+        <h2>New In This Release</h2>
+        <ul>
+            <li>
+                General
+                <ul>
+                    <li>
+                        Improved docs for many classes:
+                        
+                        <ul>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.List">Ext.List</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Panel">Ext.Panel</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.TabPanel">Ext.TabPanel</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.TabBar">Ext.TabBar</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.DatePicker">Ext.DatePicker</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Picker">Ext.Picker</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Toolbar">Ext.Toolbar</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Button">Ext.Button</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Video">Ext.Video</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Audio">Ext.Audio</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.SegmentedButton">Ext.SegmentedButton</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Sheet">Ext.Sheet</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.ActionSheet">Ext.ActionSheet</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.MessageBox">Ext.MessageBox</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Map">Ext.Map</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Anim">Ext.Anim</a></li>
+                            <li><a target="_blank" href="http://dev.sencha.com/deploy/touch/docs/?class=Ext.Carousel">Ext.Carousel</a></li>
+                        </ul>
+                    </li>
+                    <li>Fixed a recursion issue with bubbleEvents. This had caused dynamic addition/removal of tabs to result in stack overflow errors</li>
+                    <li>Fixed an issue where the iOS simulator would sometimes crash when using Sencha Touch</li>
+                    <li>MessageBox now fires the confirm/prompt callbacks even if the user hits cancel/no</li>
+					<li>Animations are now enabled by default on supported Android devices</li>
+                </ul>
+            </li>
+            
+            <li>
+                Forms
+                
+                <ul>
+                    <li>Fixed incorrect return values from Ext.form.FormPanel#getValues()</li>
+                    <li>Altered order of arguments passed to Slider's beforechange and change events - newValue now precedes oldValue</li>
+                    <li>Fixed ignored input type on Ext.form.Number</li>
+                    <li>Fixed a bug with Ext.form.Select where the default value would not be correctly displayed</li>
+                    <li>Fixed a bug where Ext.form.Select and its Picker would become desynchronized</li>
+                    <li>Fixed a bug with Ext.form.Select's reset and getValue functions</li>
+					<li>Fixed missing of 'this' instance as the first argument when firing focus and blur events in Ext.form.TextField</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h2>API Changes</h2>
+        
+        <p>
+            All of the xtypes and class names that were modified in this release have been aliased back to the original name, so your code will continue to function.
+            We strongly recommend updating your application code to reference the new names because the aliases will be removed when Sencha Touch 1.0 is released.
+        </p>
+        
+        <p>
+            In general, all form field class names omit the Field suffix (e.g. Ext.form.Text instead of Ext.form.TextField). The 'Field' suffix is considered redundant
+            due to already being within the Ext.form.* namespace. All field xtypes now contain the 'field' suffix as xtypes are not otherwise namespaced.
+        </p>
+        
+        <ul>
+            <li>
+                Modified Form Classes
+                <ul>
+                    <li>Ext.form.DatePickerField renamed to Ext.form.DatePicker</li>
+                    <li>Ext.form.EmailField renamed to Ext.form.Email</li>
+                    <li>Ext.form.HiddenField renamed to Ext.form.Hidden</li>
+                    <li>Ext.form.NumberField renamed to Ext.form.Number</li>
+                    <li>Ext.form.PasswordField renamed to Ext.form.Password</li>
+                    <li>Ext.form.SearchField renamed to Ext.form.Search</li>
+                    <li>Ext.form.SpinnerField renamed to Ext.form.Spinner</li>
+                    <li>Ext.form.TextField renamed to Ext.form.Text</li>
+                    <li>Ext.form.UrlField renamed to Ext.form.Url</li>
+                </ul>
+            </li>
+            
+            <li>
+                Modified Form xtypes
+                <ul>
+                    <li>'hidden' renamed to 'hiddenfield'</li>
+                    <li>'radio' renamed to 'radiofield'</li>
+                    <li>'checkbox' renamed to 'checkboxfield'</li>
+                    <li>'select' renamed to 'selectfield'</li>
+                    <li>'textarea' renamed to 'textareafield'</li>
+                    <li>'toggle' renamed to 'togglefield'</li>
+                </ul>
+            </li>
+            
+            <li>
+                Other modified xtypes
+                <ul>
+                    <li>'form' renamed to 'formpanel'</li>
+                    <li>'msgbox' renamed to 'messagebox'</li>
+                    <li>'thumb' renamed to 'sliderthumb'</li>
+                </ul>
+            </li>
+
+			<li>
+                Changes in Form Fields methods
+                <ul>
+                    <li>getValue() and setValue() no longer get / set the checked state of Checkboxes and Radios; use check() / uncheck() / setChecked() / isChecked() instead</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h2>Known Issues</h2>
+        <ul>
+            <li>Ext.DataView: emptyText appears while the Store is loading under some circumstances</li>
+            <li>NestedList does not show the loading mask while loading data</li>
+            <li>Stroking the IndexBar causes it to drop down a few pixels, then snaps up again when released</li>
+            <li>Kitchen Sink: Editing a leaf on the Nested List example does not hide the keyboard when tapping the 'Change' button</li>
+            <li>Imperfect styling when using a fieldset where the first or last item is a checkbox</li>
+            <li>iPhone only - some fields have a rendering glitch on the right hand side when disabled</li>
+            <li>Overlay panels can sometimes lay out incorrectly when animated</li>
+            <li>When changing orientation, floating panels do not correctly realign if aligned to an underlying element</li>
+            <li>Sortable's sorting threshold is not currently honored, causing odd behavior when trying to sort a scrollable toolbar</li>
+            <li>Odd behavior when scrolling diagonally in a Carousel. Sometimes the cards can become misaligned if 
+                scrolling up/down at the same time as scrolling left/right</li>
+        </ul>
+    </div>
+    
+    <hr>
+    
+    <div class="release">
         <h1>Release Notes for Sencha Touch 0.99</h1>
         
         <p class="notes">Release Notes: November 3, 2010<br />

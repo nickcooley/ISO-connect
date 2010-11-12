@@ -26,7 +26,7 @@ function get_channels() {
 	$channels = array(
 		0 => array(
 			'name' => 'Sencha Con',
-			'terms' => array('SenchaCon'),
+			'terms' => array('SenchaCon', 'senchacon', 'senchaCon', 'SENCHACON'),
 		),
 		1 => array(
 			'name' => 'Sencha',
@@ -42,7 +42,7 @@ function get_channels() {
 		),
 		4 => array(
 			'name' => 'Front-End Development',
-			'terms' => array('HTML', 'HTML5', 'CSS', 'js', 'CSS3', 'ajax', 'json', 'flash',),
+			'terms' => array('HTML', 'HTML5', 'CSS', 'js', 'javascript', 'CSS3', 'ajax', 'json', 'flash',),
 		),
 		5 => array(
       'name' => 'Mobile Devices',

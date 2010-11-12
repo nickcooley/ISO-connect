@@ -2,21 +2,40 @@
  * @class Ext.Video
  * @extends Ext.Media
  *
- * Provides a simple Container for HTML5 Video.
+ * <p>Provides a simple Container for HTML5 Video.</p>
  *
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #url}</li>
+ *   <li>{@link #autoPause}</li>
+ *   <li>{@link #autoResume}</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #pause}</li>
+ *   <li>{@link #play}</li>
+ *   <li>{@link #toggle}</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Video/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
 var pnl = new Ext.Panel({
     fullscreen: true,
-    items: [{
-        floating: true,
-        x: 600,
-        y: 300,
-        width: 175,
-        height: 98,
-        xtype: 'video',
-        url: "porsche911.mov",
-        posterUrl: 'porsche.png'
-    }]
+    items: [
+        {
+            xtype    : 'video',
+            x        : 600,
+            y        : 300,
+            width    : 175,
+            height   : 98,
+            url      : "porsche911.mov",
+            posterUrl: 'porsche.png'
+        }
+    ]
 });</code></pre>
  * @xtype video
  */

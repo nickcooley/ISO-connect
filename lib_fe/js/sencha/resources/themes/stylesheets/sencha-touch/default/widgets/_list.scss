@@ -38,17 +38,16 @@ $list-disclosure-size: 1.7em;
       background: #fff none;
     }
 
-    .x-list-group-items > .x-list-item, 
-    &.x-list-flat .x-list-parent > .x-list-item {
+    .x-list-item {
       position: relative;
       color: $list-color;
       padding: 0.5em 0.8em;
       border-bottom: 1px solid darken($list-bg-color, 15%);
       min-height: $global-row-height;
       display: -webkit-box;
-      .x-list-item-body {
-        padding: 0.3em;
 
+      .x-list-item-body {
+/*        padding: 0.3em;*/
         -webkit-box-flex: 1;
       }
       

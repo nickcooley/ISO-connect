@@ -68,72 +68,68 @@ Ext.layout.DockLayout = Ext.extend(Ext.layout.ComponentLayout, {
 
         // Determine if we have an autoHeight or autoWidth.
         if (height === undefined || height === null || width === undefined || width === null || contracted) {
-            if ((height === undefined && width === undefined) && (ownerCt && ownerCt.layout && (ownerCt.layout.type != 'autocontainer' && ownerCt.layout.type != 'box'))) {
+            // Auto-everything, clear out any style height/width and read from css
+            if ((height === undefined || height === null) && (width === undefined || width === null)) {
+                autoHeight = true;
+                autoWidth = true;
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(null, null);
+                }
+                me.setBodyBox({width: null, height: null});
+            }
+            // Auto-height
+            else if (height === undefined || height === null) {
+                autoHeight = true;
+                // Clear any sizing that we already set in a previous layout
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(width, null);
+                }
+                me.setBodyBox({width: width, height: null});
+            // Auto-width
             }
             else {
-                // Auto-everything, clear out any style height/width and read from css
-                if ((height === undefined || height === null) && (width === undefined || width === null)) {
-                    autoHeight = true;
-                    autoWidth = true;
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(null, null);
-                    }
-                    me.setBodyBox({width: null, height: null});
+                autoWidth = true;
+                // Clear any sizing that we already set in a previous layout
+                if (!owner.animCollapse || (!expanded && !contracted)) {
+                    me.setTargetSize(null, height);
                 }
-                // Auto-height
-                else if (height === undefined || height === null) {
-                    autoHeight = true;
-                    // Clear any sizing that we already set in a previous layout
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(width, null);
-                    }
-                    me.setBodyBox({width: width, height: null});
-                // Auto-width
-                }
-                else {
-                    autoWidth = true;
-                    // Clear any sizing that we already set in a previous layout
-                    if (!owner.animCollapse || (!expanded && !contracted)) {
-                        me.setTargetSize(null, height);
-                    }
-                    me.setBodyBox({width: null, height: height});
-                }
+                me.setBodyBox({width: null, height: height});
+            }
 
-                // Run the container
-                if (!collapsed && layout && layout.isLayout) {
-                    layout.layout();
-                }
+            // Run the container
+            if (!collapsed && layout && layout.isLayout) {
+                layout.layout();
+            }
 
-                // The dockItems method will add all the top and bottom docked items height
-                // to the info.panelSize height. Thats why we have to call setSize after
-                // we dock all the items to actually set the panel's width and height.
-                // We have to do this because the panel body and docked items will be position
-                // absolute which doesnt stretch the panel.
-                me.dockItems(autoWidth, autoHeight);
-                if (collapsed) {
-                    if (headerItem) {
-                        if (headerItem.dock == 'top' || headerItem.dock == 'bottom') {
-                            info.size.height = headerItem.getHeight();
-                        }
-                        else {
-                            info.size.width = headerItem.getWidths();
-                        }
-                    } else {
-                        info.size.height = 0;
-                    }
-                }
-                if (expanded || contracted) {
-                    if (owner.animCollapse) {
-                        Ext.createDelegate(owner.animCollapseFn, owner, [info.size.width, info.size.height])();
+            // The dockItems method will add all the top and bottom docked items height
+            // to the info.panelSize height. Thats why we have to call setSize after
+            // we dock all the items to actually set the panel's width and height.
+            // We have to do this because the panel body and docked items will be position
+            // absolute which doesnt stretch the panel.
+            me.dockItems(autoWidth, autoHeight);
+            if (collapsed) {
+                if (headerItem) {
+                    if (headerItem.dock == 'top' || headerItem.dock == 'bottom') {
+                        info.size.height = headerItem.getHeight();
                     }
                     else {
-                        Ext.createDelegate(owner['after' + (expanded ? 'Expand' : 'Collapse')], owner)();
-                        me.setTargetSize(info.size.width, info.size.height);
+                        info.size.width = headerItem.getWidths();
                     }
+                } else {
+                    info.size.height = 0;
+                }
+            }
+            if (expanded || contracted) {
+                if (owner.animCollapse) {
+                    Ext.createDelegate(owner.animCollapseFn, owner, [info.size.width, info.size.height])();
                 }
                 else {
+                    Ext.createDelegate(owner['after' + (expanded ? 'Expand' : 'Collapse')], owner)();
                     me.setTargetSize(info.size.width, info.size.height);
                 }
+            }
+            else {
+                me.setTargetSize(info.size.width, info.size.height);
             }
         }
         else {

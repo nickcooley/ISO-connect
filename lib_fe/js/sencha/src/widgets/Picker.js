@@ -5,7 +5,7 @@
  * <p>A general picker class.  Slots are used to organize multiple scrollable slots into a single picker. {@link #slots} is 
  * the only necessary property</p>
  * 
- * <p>Example usage:</p>
+ * <h2>Example usage:</h2>
  * <pre><code>
 var picker = new Ext.Picker({
     slots: [
@@ -24,8 +24,6 @@ var picker = new Ext.Picker({
 picker.show();
  * </code></pre>
  * 
- * <p>See also: {@link Ext.DatePicker}</p>
- * 
  * @constructor
  * Create a new List
  * @param {Object} config The config object
@@ -43,19 +41,27 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
     hideOnMaskTap: false,
     
     /**
-     * @cfg {String} doneText
-     * The text to be used on the done button if {@link #showDoneButton} is true.
+     * @cfg {String/Mixed} doneButton
+     * Can be either:<ul>
+     * <li>A {String} text to be used on the Done button</li>
+     * <li>An {Object} as config for {@link Ext.Button}</li>
+     * <li>false or null to hide it</li></ul>
+     *
      * Defaults to 'Done'.
      */
-    doneText: 'Done',
+    doneButton: 'Done',
     
     /**
-     * @cfg {Boolean} showDoneButton
-     * True to show the done button.
-     * Defaults to true.
+     * @cfg {String/Mixed} doneButton
+     * Can be either:<ul>
+     * <li>A {String} text to be used on the Done button</li>
+     * <li>An {Object} as config for {@link Ext.Button}</li>
+     * <li>false or null to hide it</li></ul>
+     *
+     * Defaults to 'Done'.
      */
-    showDoneButton : true,
-    
+    cancelButton: 'Cancel',
+
     /**
      * @cfg {Number} height
      * The height of the picker.
@@ -96,6 +102,44 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
     
     // private
     initComponent : function() {
+        //<deprecated since="0.99">
+        if (Ext.isDefined(this.showDoneButton)) {
+            console.warn("[Ext.Picker] showDoneButton config is deprecated. Please use doneButton instead");
+        }
+
+        if (Ext.isDefined(this.doneText)) {
+            console.warn("[Ext.Picker] doneText config is deprecated. Please use doneButton instead");
+            this.doneButton = this.doneText;
+        }
+        //</deprecated>
+
+        this.addEvents(
+            /**
+             * @event pick
+             * Fired when a slot has been picked
+             * @param {Ext.Picker} this This Picker
+             * @param {Object} The values of this picker's slots, in {name:'value'} format
+             * @param {Ext.Picker.Slot} slot An instance of Ext.Picker.Slot that has been picked
+             */
+            'pick',
+
+            /**
+             * @event change
+             * Fired when the picked value has changed
+             * @param {Ext.Picker} this This Picker
+             * @param {Object} The values of this picker's slots, in {name:'value'} format
+             */
+            'change',
+
+            /**
+             * @event cancel
+             * Fired when the cancel button is tapped and the values are reverted back to
+             * what they were
+             * @param {Ext.Picker} this This Picker
+             */
+            'cancel'
+        );
+            
         this.layout = {
             type: 'hbox',
             align: 'stretch'
@@ -113,44 +157,88 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
         }
 
         this.on('slotpick', this.onSlotPick, this);
-        this.addEvents('pick', 'change');
 
-        if (this.showDoneButton) {
+        if (this.doneButton || this.cancelButton) {
+            var toolbarItems = [];
+
+            if (this.cancelButton) {
+                toolbarItems.push(
+                    Ext.apply(
+                        {
+                            ui: 'decline',
+                            handler: this.onCancelButtonTap,
+                            scope: this
+                        },
+                        ((Ext.isObject(this.cancelButton) ? this.cancelButton : { text: String(this.cancelButton) }))
+                    )
+                );
+            }
+
+            toolbarItems.push({xtype: 'spacer'});
+
+            if (this.doneButton) {
+                toolbarItems.push(
+                    Ext.apply(
+                        {
+                            ui: 'action',
+                            handler: this.onDoneButtonTap,
+                            scope: this
+                        },
+                        ((Ext.isObject(this.doneButton) ? this.doneButton : { text: String(this.doneButton) }))
+                    )
+                );
+            }
+
             this.toolbar = new Ext.Toolbar(Ext.applyIf(this.buttonBar || {
-                dock: 'top'
-            }));
-
-            this.toolbar.add([
-                {xtype: 'spacer'},
-                {
-                    xtype: 'button',
-                    ui: 'action',
-                    text: this.doneText,
-                    handler: this.onDoneTap,
-                    scope: this
+                dock: 'top',
+                items: toolbarItems,
+                defaults: {
+                    xtype: 'button'
                 }
-            ]);
-
+            }));
+           
             this.dockedItems = this.dockedItems ? (Ext.isArray(this.dockedItems) ? this.dockedItems : [this.dockedItems]) : [];
             this.dockedItems.push(this.toolbar);
         }
 
         Ext.Picker.superclass.initComponent.call(this);
+    },
+
+    // @private
+    afterRender: function() {
+        Ext.Picker.superclass.afterRender.apply(this, arguments);
 
         if (this.value) {
             this.setValue(this.value, false);
         }
     },
-    
+
     /**
      * @private
      * Called when the done button has been tapped.
      */
-    onDoneTap : function() {
+    onDoneButtonTap : function() {
         var anim = this.animSheet('exit');
         Ext.apply(anim, {
             after: function() {
                 this.fireEvent('change', this, this.getValue());
+            },
+            scope: this
+        });
+        this.hide(anim);
+    },
+
+    /**
+     * @private
+     * Called when the cancel button has been tapped.
+     */
+    onCancelButtonTap : function() {
+        var anim = this.animSheet('exit');
+        Ext.apply(anim, {
+            after: function() {
+                // Set the value back to what it was previously
+                this.setValue(this.values);
+                this.fireEvent('cancel', this);
             },
             scope: this
         });
@@ -161,7 +249,7 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
      * @private
      * Called when a slot has been picked.
      */
-    onSlotPick : function(slot, value, node) {
+    onSlotPick: function(slot, value, node) {
         this.fireEvent('pick', this, this.getValue(), slot);
         return false;
     },
@@ -169,10 +257,11 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
     /**
      * Sets the values of the pickers slots
      * @param {Object} values The values in a {name:'value'} format
-     * @animated {Boolean} animated True to animate setting the values
+     * @param {Boolean} animated True to animate setting the values
+     * @return {Ext.Picker} this This picker
      */
-    setValue : function(values, animated) {
-        var key, slot,
+    setValue: function(values, animated) {
+        var slot,
             items = this.items.items,
             ln = items.length;
 
@@ -181,34 +270,38 @@ Ext.Picker = Ext.extend(Ext.Sheet, {
             for (var i = 0; i < ln; i++) {
                 items[i].setValue(0);
             }
+            
             return this;
         }
 
-        for (key in values) {
+        Ext.iterate(values, function(key, value) {
             slot = this.child('[name=' + key + ']');
+            
             if (slot) {
-                slot.setValue(values[key], animated);
+                slot.setValue(value, animated);
             }
-        }
+        }, this);
 
+        this.values = values;
+       
         return this;
     },
     
     /**
      * Returns the values of each of the pickers slots
-     * @return {Object} The value of the pickers slots
+     * @return {Object} The values of the pickers slots
      */
-    getValue : function() {
-        var value = {},
+    getValue: function() {
+        var values = {},
             items = this.items.items,
             ln = items.length, item, i;
 
         for (i = 0; i < ln; i++) {
             item = items[i];
-            value[item.name] = item.getValue();
+            values[item.name] = item.getValue();
         }
 
-        return value;
+        return values;
     }
 });
 
@@ -231,6 +324,7 @@ Ext.regModel('x-textvalue', {
  */
 Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     isSlot: true,
+    
     flex: 1,
 
     /**
@@ -293,7 +387,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * @private
      */
-    getElConfig : function() {
+    getElConfig: function() {
         return {
             tag: 'div',
             id: this.id,
@@ -307,7 +401,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     initComponent : function() {
         // <debug>
         if (!this.name) {
-            throw 'Each picker slot is required to have a name.';
+            throw new Error('Each picker slot is required to have a name.');
         }
         // </debug>
 
@@ -403,7 +497,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * @private
      */
-    afterComponentLayout : function() {
+    afterComponentLayout: function() {
         // Dont call superclass afterComponentLayout since we dont want
         // the scroller to get a min-height
         Ext.defer(this.setupBar, 200, this);
@@ -412,7 +506,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * @private
      */
-    initEvents : function() {
+    initEvents: function() {
         this.mon(this.scroller, {
             scrollend: this.onScrollEnd,
             scope: this
@@ -422,7 +516,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * @private
      */
-    onScrollEnd : function(scroller, offset) {
+    onScrollEnd: function(scroller, offset) {
         this.selectedNode = this.getNode(Math.round(offset.y / this.barHeight));
         this.selectedIndex = this.indexOf(this.selectedNode);
         this.fireEvent('slotpick', this, this.getValue(), this.selectedNode);
@@ -442,7 +536,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
      * @private
      * Called when an item has been tapped
      */
-    onItemTap : function(node) {
+    onItemTap: function(node) {
         Ext.Picker.Slot.superclass.onItemTap.apply(this, arguments);
         this.setSelectedNode(node);
     },
@@ -450,14 +544,14 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * 
      */
-    getSelectedNode : function() {
+    getSelectedNode: function() {
         return this.selectedNode;
     },
     
     /**
      * 
      */
-    setSelectedNode : function(selected, animate) {
+    setSelectedNode: function(selected, animate) {
         // If it is a number, we assume we are dealing with an index
         if (Ext.isNumber(selected)) {
             selected = this.getNode(selected);
@@ -477,7 +571,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * 
      */
-    getValue : function() {
+    getValue: function() {
         var record = this.store.getAt(this.selectedIndex);
         return record ? record.get(this.valueField) : null;
     },
@@ -485,7 +579,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
     /**
      * 
      */
-    setValue : function(value, animate) {
+    setValue: function(value, animate) {
         var index = this.store.find(this.valueField, value);
         if (index != -1) {
             if (!this.rendered) {
@@ -496,7 +590,7 @@ Ext.Picker.Slot = Ext.extend(Ext.DataView, {
         }
     },
 
-    onDestroy : function() {
+    onDestroy: function() {
         if (this.tempStore) {
             this.store.destroyStore();
             this.store = null;

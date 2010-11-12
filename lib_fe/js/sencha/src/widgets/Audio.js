@@ -2,16 +2,36 @@
  * @class Ext.Audio
  * @extends Ext.Media
  *
- * Provides a simple container for HTML5 Audio.
- * Recommended types: Uncompressed WAV and AIF audio, MP3 audio, and AAC-LC or HE-AAC audio
- *
+ * <p>Provides a simple container for HTML5 Audio.</p>
+ * <p><i>Recommended types: Uncompressed WAV and AIF audio, MP3 audio, and AAC-LC or HE-AAC audio</i></p>
+ * 
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #url}</li>
+ *   <li>{@link #autoPause}</li>
+ *   <li>{@link #autoResume}</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #pause}</li>
+ *   <li>{@link #play}</li>
+ *   <li>{@link #toggle}</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Audio/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
  * <pre><code>
 var pnl = new Ext.Panel({
     fullscreen: true,
-    items: [{
-        xtype: 'audio',
-        url: "who-goingmobile.mp3"
-    }]
+    items: [
+        {
+            xtype: 'audio',
+            url  : "who-goingmobile.mp3"
+        }
+    ]
 });</code></pre>
  * @xtype audio
  */

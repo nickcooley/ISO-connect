@@ -596,7 +596,7 @@ Ext.data.AbstractStore = Ext.extend(Ext.util.Observable, {
         };
 
         if (this.batchUpdateMode == 'operation') {
-            listeners['operation-complete'] = this.onBatchOperationComplete;
+            listeners['operationcomplete'] = this.onBatchOperationComplete;
         } else {
             listeners['complete'] = this.onBatchComplete;
         }

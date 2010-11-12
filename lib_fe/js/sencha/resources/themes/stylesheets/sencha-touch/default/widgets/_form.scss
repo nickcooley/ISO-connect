@@ -200,7 +200,7 @@ $form-scrollable-fields: '.x-field-slider, .x-field-toggle, .x-field-checkbox, .
   // Required fields
   
   .x-field-required {
-    label:after {
+    label:after, .x-form-label:after {
       content: "*";
       display: inline;
     }
@@ -253,7 +253,8 @@ $form-scrollable-fields: '.x-field-slider, .x-field-toggle, .x-field-checkbox, .
       @include insertion(1.3em, 1.3em, .8em, auto);
       right: $form-spacing;
       -webkit-mask: theme-image($theme-name, 'check.png') no-repeat;
-      -webkit-mask-size: 1.3em auto;
+      /* somehow the auto height of this mask image crashes the simulators, changed it to a fixed value for now */
+      -webkit-mask-size: 1.3em 1.1em;
       @include background-gradient($form-light, 'flat');
     }
     

@@ -53,8 +53,8 @@ $stmt_deleteold = $mysqli->prepare('DELETE FROM status_latest where channel_id =
 
 
 //Voices inserts for full list and top 100, delete from the top 100
-$stmt_vupdate = $mysqli->prepare('INSERT INTO voices VALUES(?,?,?,1,?) ON DUPLICATE KEY UPDATE count=count+1');
-$stmt_vlupdate = $mysqli->prepare('INSERT INTO voices_latest VALUES(?,?,?,1,?) ON DUPLICATE KEY UPDATE count=count+1');
+$stmt_vupdate = $mysqli->prepare('INSERT INTO voices VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE count=count+1');
+$stmt_vlupdate = $mysqli->prepare('INSERT INTO voices_latest VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE count=count+1');
 $stmt_vdeleteold = $mysqli->prepare('DELETE FROM voices_latest where channel_id = ? order by count ASC limit 1');
 
 	$context = stream_context_create($opts);
@@ -106,8 +106,7 @@ $stmt_vdeleteold = $mysqli->prepare('DELETE FROM voices_latest where channel_id 
                                         $stmt_vupdate->bind_param('ssi',
                                                 $tweet->user->screen_name,
                                                 $tweet->user->profile_image_url,
-                                                $cid,
-						$tweet->id
+                                                $cid
                                         );
 
                                         if (!$stmt_vupdate->execute()) {
@@ -118,8 +117,7 @@ $stmt_vdeleteold = $mysqli->prepare('DELETE FROM voices_latest where channel_id 
                                         $stmt_vlupdate->bind_param('ssi',
                                                 $tweet->user->screen_name,
                                                 $tweet->user->profile_image_url,
-                                                $cid,
-						$tweet->id
+                                                $cid
                                         );
 
                                         if (!$stmt_vlupdate->execute()) {
@@ -176,4 +174,3 @@ function get_channel_matches($text, $channels) {
 		return FALSE;
 	}
 }
-?>

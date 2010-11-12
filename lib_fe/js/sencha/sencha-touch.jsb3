@@ -173,17 +173,19 @@
             "id"    : "dom",
             "files" : [
                 {"path": "src/core/", "name": "Element.js"},
-                {"path": "src/core/", "name": "Element.static.js"},
+                {"path": "src/platform/src/core/", "name": "Element.static.js"},
+                {"path": "src/core/", "name": "Element.static-more.js"},
                 {"path": "src/core/", "name": "Element.position.js"},
                 {"path": "src/core/", "name": "Element.style.js"},
-                {"path": "src/core/", "name": "Element.traversal.js"},
-                {"path": "src/core/", "name": "Element.insertion.js"},
+                {"path": "src/platform/src/core/", "name": "Element.traversal.js"},
+                {"path": "src/core/", "name": "Element.traversal-more.js"},
+                {"path": "src/platform/src/core/", "name": "Element.insertion.js"},
                 {"path": "src/core/", "name": "Element.alignment.js"},
                 {"path": "src/core/", "name": "CompositeElement.js"},
                 {"path": "src/core/", "name": "DomHelper.js"},
                 {"path": "src/core/", "name": "DomQuery.js"},
                 {"path": "src/core/", "name": "Anim.js"},
-                {"path": "src/core/", "name": "Anim-more.js"}
+                {"path": "src/core/", "name": "Anim.more.js"}
             ]
         },
         {
@@ -226,6 +228,8 @@
                 {"path": "src/widgets/", "name": "IndexBar.js"},
                 {"path": "src/widgets/", "name": "Toolbar.js"},
                 {"path": "src/widgets/", "name": "Sheet.js"},
+                {"path": "src/widgets/", "name": "TabBar.js"},
+                {"path": "src/widgets/", "name": "Tab.js"},
                 {"path": "src/widgets/", "name": "TabPanel.js"},
                 {"path": "src/widgets/", "name": "Carousel.js"},
                 {"path": "src/widgets/", "name": "Map.js"},
@@ -242,19 +246,19 @@
                 {"path": "src/widgets/form/", "name": "Field.js"},
                 {"path": "src/widgets/form/", "name": "Slider.js"},
                 {"path": "src/widgets/form/", "name": "Toggle.js"},
-                {"path": "src/widgets/form/", "name": "TextField.js"},
-                {"path": "src/widgets/form/", "name": "PasswordField.js"},
-                {"path": "src/widgets/form/", "name": "EmailField.js"},
-                {"path": "src/widgets/form/", "name": "UrlField.js"},
-                {"path": "src/widgets/form/", "name": "SearchField.js"},
-                {"path": "src/widgets/form/", "name": "NumberField.js"},
-                {"path": "src/widgets/form/", "name": "SpinnerField.js"},
-                {"path": "src/widgets/form/", "name": "HiddenField.js"},
+                {"path": "src/widgets/form/", "name": "Text.js"},
+                {"path": "src/widgets/form/", "name": "Password.js"},
+                {"path": "src/widgets/form/", "name": "Email.js"},
+                {"path": "src/widgets/form/", "name": "Url.js"},
+                {"path": "src/widgets/form/", "name": "Search.js"},
+                {"path": "src/widgets/form/", "name": "Number.js"},
+                {"path": "src/widgets/form/", "name": "Spinner.js"},
+                {"path": "src/widgets/form/", "name": "Hidden.js"},
                 {"path": "src/widgets/form/", "name": "Checkbox.js"},
                 {"path": "src/widgets/form/", "name": "Radio.js"},
                 {"path": "src/widgets/form/", "name": "Select.js"},
                 {"path": "src/widgets/form/", "name": "TextArea.js"},
-                {"path": "src/widgets/form/", "name": "DatePickerField.js"}
+                {"path": "src/widgets/form/", "name": "DatePicker.js"}
             ]
         }
     ],

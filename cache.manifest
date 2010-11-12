@@ -1,0 +1,19 @@
+CACHE MANIFEST
+
+# rev 1.9
+CACHE: 
+/lib_fe/css/ext-touch.css
+/lib_fe/css/style.css
+/lib_fe/img/ipad_loading_screen_portrait.png
+/lib_fe/img/isobar_logo.png
+/lib_fe/img/loading.gif
+/lib_fe/img/ranking.png
+/lib_fe/js/categories.js
+/lib_fe/js/categoryList2.js
+/lib_fe/js/master.js
+/lib_fe/js/sharing4.js
+/lib_fe/js/tabs2.js
+/lib_fe/js/templates.js
+/lib_fe/js/unlock2.js
+/lib_fe/js/voices.js
+/lib_fe/js/sencha-touch-debug.js

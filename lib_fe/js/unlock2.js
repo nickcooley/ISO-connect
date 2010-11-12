@@ -12,7 +12,7 @@ iso.formScreen = Ext.extend(Ext.Sheet, {
   scroll: false,
   listeners: {
     hide: function(){
-      this.unlockForm.setCard(0);
+      this.unlockForm.setActiveItem(0);
       this.unlockForm.ps.form.reset();
     }
   },
@@ -256,7 +256,7 @@ iso.regProcess = Ext.extend(Ext.Panel, {
     console.log(this);
     //document.location = 'http://www.twitter.com';
     
-    this.setCard(1, 'slide');
+    this.setActiveItem(1, 'slide');
   }
 });
   

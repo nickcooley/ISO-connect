@@ -328,9 +328,9 @@ Ext.data.Store = Ext.extend(Ext.data.AbstractStore, {
             this.sort();
             delete this.inlineData;
         } else if (this.autoLoad) {
-            //Ext.defer(this.load, 10, this, [typeof this.autoLoad == 'object' ? this.autoLoad : undefined]);
+            Ext.defer(this.load, 10, this, [typeof this.autoLoad == 'object' ? this.autoLoad : undefined]);
             // Remove the defer call, we may need reinstate this at some point, but currently it's not obvious why it's here.
-            this.load(typeof this.autoLoad == 'object' ? this.autoLoad : undefined);
+            // this.load(typeof this.autoLoad == 'object' ? this.autoLoad : undefined);
         }
     },
 
@@ -435,10 +435,11 @@ new Ext.data.Store({
 
         records = [].concat(records);
         for (i = 0, len = records.length; i < len; i++) {
-            records[i].set(this.modelDefaults);
+            record = this.createModel(records[i]);
+            record.set(this.modelDefaults);
 
-            this.data.insert(index + i, records[i]);
-            records[i].join(this);
+            this.data.insert(index + i, record);
+            record.join(this);
         }
 
         if (this.snapshot) {
@@ -452,24 +453,27 @@ new Ext.data.Store({
     /**
      * Adds Model instances to the Store by instantiating them based on a JavaScript object. When adding already-
      * instantiated Models, use {@link #insert} instead. The instances will be added at the end of the existing collection.
+     * This method accepts either a single argument array of Model instances or any number of model instance arguments.
      * Sample usage:
+     * 
 <pre><code>
 myStore.add({some: 'data'}, {some: 'other data'});
 </code></pre>
+     * 
      * @param {Object} data The data for each model
      * @return {Array} The array of newly created model instances
      */
-    add: function() {
-        var records = Array.prototype.slice.apply(arguments),
-            length  = records.length,
+    add: function(records) {
+        //accept both a single-argument array of records, or any number of record arguments
+        if (!Ext.isArray(records)) {
+            records = Array.prototype.slice.apply(arguments);
+        }
+        
+        var length  = records.length,
             record, i;
 
         for (i = 0; i < length; i++) {
-            record = records[i];
-            
-            if (!(record instanceof Ext.data.Model)) {
-                record = Ext.ModelMgr.create(record, this.model);
-            }
+            record = this.createModel(records[i]);
 
             if (record.phantom == false) {
                 record.needsAdd = true;
@@ -481,6 +485,19 @@ myStore.add({some: 'data'}, {some: 'other data'});
         this.insert(this.data.length, records);
 
         return records;
+    },
+
+    /**
+     * Converts a literal to a model, if it's not a model already 
+     * @private
+     * @{param} record {Ext.data.Model/Object} The record to create
+     * @return {Ext.data.Model}
+     */
+    createModel: function(record){
+        if (!(record instanceof Ext.data.Model)) {
+            record = Ext.ModelMgr.create(record, this.model);
+        }
+        return record;
     },
 
     /**

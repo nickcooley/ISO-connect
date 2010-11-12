@@ -1,12 +1,14 @@
 /**
  * @class Ext.Sheet
  * @extends Ext.Panel
- * @xtype sheet
  *
  * <p>A general sheet class.  This renderable container provides base support for orientation-aware
  * transitions for popup or side-anchored sliding Panels.</p>
  *
- * <p>Example usage:</p>
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Sheet/screenshot.png" /></p>
+ * 
+ * <h2>Example usage:</h2>
  * <pre><code>
 var sheet = new Ext.Sheet({
     height  : 200,
@@ -205,19 +207,27 @@ Ext.reg('sheet', Ext.Sheet);
  * @class Ext.ActionSheet
  * @extends Ext.Sheet
  *
- * <p>A Button Sheet class designed to popup or slide/anchor a series of buttons</p>
+ * <p>A Button Sheet class designed to popup or slide/anchor a series of buttons.</p>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.ActionSheet/screenshot.png" /></p>
  *
+ * <h2>Example code:</h2>
  * <pre><code>
 var actionSheet = new Ext.ActionSheet({
-    items: [{
-        text: 'Confirm',
-        ui: 'confirm',
-        handler : Ext.emptyFn
-    },{
-        text : 'Cancel',
-        ui: 'decline',
-        handler: Ext.emptyFn
-    }]
+    items: [
+        {
+            text: 'Delete draft',
+            ui  : 'decline'
+        },
+        {
+            text: 'Save draft'
+        },
+        {
+            text: 'Cancel',
+            ui  : 'confirm'
+        }
+    ]
 });
 actionSheet.show();</code></pre>
  * @xtype sheet

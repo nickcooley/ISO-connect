@@ -2,8 +2,7 @@
  * @class Ext.LoadMask
  * A simple utility class for generically masking elements while loading data.  If the {@link #store}
  * config option is specified, the masking will be automatically synchronized with the store's loading
- * process and the mask element will be cached for reuse.  For all other elements, this mask will replace the
- * element's Updater load indicator and will be destroyed after the initial load.
+ * process and the mask element will be cached for reuse.
  * <p>Example usage:</p>
  *<pre><code>
 // Basic mask:
@@ -85,14 +84,14 @@ Ext.LoadMask = Ext.extend(Ext.util.Observable, {
     /**
      * Disables the mask to prevent it from being displayed
      */
-    disable : function(){
+    disable : function() {
        this.disabled = true;
     },
 
     /**
      * Enables the mask so that it can be displayed
      */
-    enable : function(){
+    enable : function() {
         this.disabled = false;
     },
 
@@ -105,7 +104,7 @@ Ext.LoadMask = Ext.extend(Ext.util.Observable, {
     },
     
     // private
-    onLoad : function(){
+    onLoad : function() {
         this.el.unmask();
         this.fireEvent('hide', this, this.el, this.store);
     },

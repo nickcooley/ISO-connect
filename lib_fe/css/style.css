@@ -14,6 +14,10 @@ body {background:#fff;}
     .listAuthors div.ranking {height:auto !important;}
      
     .x-list.x-list-flat .x-list-parent .ranking {background-image:url(../img/ranking.png); background-repeat:no-repeat; padding-left:43px; display:block;}
+    .x-list.x-list-flat .x-list-parent .unranked {padding-left:43px;}
+    
+    
+    .listAuthors.x-list.x-list-flat .x-list-item, .tweetList.x-list.x-list-flat .x-list-item  {height: auto;}
     .li1 {background-position:0 16px;}
     .li2 {background-position:0 -29px;}
     .li3 {background-position:0 -76px;}
@@ -25,15 +29,27 @@ body {background:#fff;}
     .li9 {background-position:0 -355px;}
     .li10 {background-position:0 -400px;}
     
+    .x-phone .li1 {background-position:0 3px;}
+    .x-phone .li2 {background-position:0 -41px;}
+    .x-phone .li3 {background-position:0 -89px;}
+    .x-phone .li4 {background-position:0 -135px;}
+    .x-phone .li5 {background-position:0 -183px;}
+    .x-phone .li6 {background-position:0 -230px;}
+    .x-phone .li7 {background-position:0 -274px;}
+    .x-phone .li8 {background-position:0 -329px;}
+    .x-phone .li9 {background-position:0 -370px;}
+    .x-phone .li10 {background-position:0 -410px;}
     
-    .authorDetails .authorDetails {padding:0;}
-    .authorDetails {background: #878787; color:#fff; padding:10px; }
-    .ranking .authorDetails, table.authorDetails {background:none; color: #494949; padding:0;}   
+    .authorDetails .authorDetails , .listAuthors .authorDetails {-webkit-box-shadow:0px 0px 0px;}    
+    .authorDetails .authorDetails {padding:0; }
+    .authorDetails {background: #878787; color:#fff; padding:10px; -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);}
+    .unranked .authorDetails, .ranking .authorDetails, table.authorDetails {background:none; color: #494949; padding:0;}   
      .authorDetails img {float:left; margin-right:10px;}
      .authorDetails h2 {font-weight:bold; font-size:1.25em;}
     .x-phone  .x-docked .authorDetails h2 { font-size:1em;}
     
     table.authorDetails { border-collapse:separate ;-webkit-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3); -webkit-border-radius: 15px;}
+    /*.x-phone table.authorDetails {width:170px;} */
     table.authorDetails  {}
     table.authorDetails td{padding:15px; border-bottom:1px solid #e5e5e5;}
     table.authorDetails tr.stats td {text-align:center;}
@@ -68,7 +84,7 @@ body {background:#fff;}
 
 
     .x-list.x-list-flat .x-list-parent > div.tweet {height:auto;}
-    div.tweet img, .authorDetails img {width:48px; height:48px;}
+    div.tweet img, .authorDetails img {width:48px; height:48px; -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,0.3);}
     div.tweet img, div.tweet .tweet-bubble {float:left; margin-right:15px;}
     
     .tweet a {color:#F06627; }
@@ -110,6 +126,11 @@ body {background:#fff;}
     
     .frmError {background:url(../img/icons.png) 0 -257px no-repeat; font-size: 12px; padding: 20px 0 20px 40px; }
     
+    .detailSheet {-webkit-box-shadow: #000 0 1em 2em;}
+    
+    .x-list.tweetList .x-list-item, .x-list.channelList .x-list-item {padding:0 !important; min-height: 1.75em;}
+    .x-list.channelList .x-list-item .chItem, .x-list.tweetList .x-list-item .tweet {padding: 0.4em 0.8em; }
+    .x-phone .x-list.channelList .x-list-item {min-height: 0;}
 /* clearfix hacks */
 
 .clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }

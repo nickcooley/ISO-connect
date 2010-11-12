@@ -48,7 +48,6 @@ function check_required_get_params($params) {
  */
 function to_json($value, $force_wrap = FALSE) {
 	$retval = json_encode($value);
-	error_log("To Json: " . $retval . " End of String");
 	if ((isset($_GET['wrap']) && $_GET['wrap'] == 'true') || $force_wrap == TRUE) {
 		return 'Ext.util.JSONP.callback(' . $retval . ');';
 	}

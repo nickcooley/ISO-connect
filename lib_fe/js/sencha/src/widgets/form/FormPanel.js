@@ -53,7 +53,7 @@ form.load(user);
 Ext.form.FormPanel = Ext.extend(Ext.Panel, {
     /**
      * @cfg {Boolean} standardSubmit
-     * Wether or not we want to perform a standard form submit. Defaults to false/
+     * Wether or not we want to perform a standard form submit. Defaults to false
      */
     standardSubmit: false,
 
@@ -63,7 +63,7 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
      * @cfg {String} url
      * The default Url for submit actions
      */
-    url : undefined,
+    url: undefined,
     
     /**
      * @cfg {Object} baseParams
@@ -81,7 +81,7 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
         '<div class="{cls}">{message}&hellip;</div>'
     ),
 
-    getElConfig : function() {
+    getElConfig: function() {
         return Ext.apply(Ext.form.FormPanel.superclass.getElConfig.call(this), {
             tag: 'form'
         });
@@ -124,10 +124,8 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
     
     // @private
     afterRender : function() {
-        var me = this;
-
         Ext.form.FormPanel.superclass.afterRender.call(this);
-        me.el.on('submit', this.onSubmit, this);
+        this.el.on('submit', this.onSubmit, this);
     },
 
     // @private
@@ -212,9 +210,11 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
      * @return {Ext.data.Connection} request Object
      */
 
-    submit : function(options) {
+    submit: function(options) {
         var form = this.el.dom || {},
-            O = Ext.apply({
+            formValues
+
+            options = Ext.apply({
                url : this.url || form.action,
                submitDisabled : false,
                method : form.method || 'post',
@@ -224,58 +224,63 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
                headers : null,
                success : null,
                failure : null
-            }, options || {}),
-            formValues = this.getValues(this.standardSubmit || !O.submitDisabled);
+            }, options || {});
+
+            formValues = this.getValues(this.standardSubmit || !options.submitDisabled);
         
         if (this.standardSubmit) {
             if (form) {
-                if (O.url && Ext.isEmpty(form.action)) {
-                    form.action = O.url;
+                if (options.url && Ext.isEmpty(form.action)) {
+                    form.action = options.url;
                 }
-                form.method = (O.method || form.method).toLowerCase();
+
+                form.method = (options.method || form.method).toLowerCase();
+
                 if (this.fireEvent('beforesubmit', this, formValues, options) !== false) {
                     form.submit();
                 }
             }
             return null;
         }
+        
         if (this.fireEvent('beforesubmit', this, formValues, options ) !== false) {
-            if (O.waitMsg) {
-                this.showMask(O.waitMsg);
+            if (options.waitMsg) {
+                this.showMask(options.waitMsg);
             }
             
             return Ext.Ajax.request({
-                url     : O.url,
-                method  : O.method,
+                url     : options.url,
+                method  : options.method,
                 rawData : Ext.urlEncode(Ext.apply(
-                    Ext.apply({},this.baseParams || {}),
-                    O.params || {},
+                    Ext.apply({}, this.baseParams || {}),
+                    options.params || {},
                     formValues
-                  )),
-                autoAbort : O.autoAbort,
+                )),
+                autoAbort : options.autoAbort,
                 headers  : Ext.apply(
                    {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-                    O.headers || {}),
+                    options.headers || {}),
                 scope    : this,
                 callback : function(options, success, response) {
-                     var R = response;
                      this.hideMask();   
                         
                      if (success) {
-                          R = Ext.decode(R.responseText);
-                          success = !!R.success;
-                          if (success) {
-                              if (typeof O.success == 'function') {
-                                 O.scope ? O.success.call(O.scope, this, R) : O.success(this, R);
-                              }
-                              this.fireEvent('submit', this, R);
-                              return;
-                          }
-                     }
-                    if (typeof O.failure == 'function') {
-                        O.scope ? O.failure.call(O.scope, this, R) : O.failure(this, R);
+                          response = Ext.decode(response.responseText);
+                          success = !!response.success;
+                        if (success) {
+                            if (typeof options.success == 'function') {
+                                options.scope ? options.success.call(options.scope, this, response) : options.success(this, response);
+                            }
+                            this.fireEvent('submit', this, response);
+                            return;
+                        }
                     }
-                    this.fireEvent('exception', this, R);
+
+                    if (typeof options.failure == 'function') {
+                        options.scope ? options.failure.call(options.scope, this, response) : options.failure(this, response);
+                    }
+                    
+                    this.fireEvent('exception', this, response);
                 }
             });
         }
@@ -337,11 +342,12 @@ Ext.form.FormPanel = Ext.extend(Ext.Panel, {
         return this;
     },
     
-    //<debug>
-    updateModel : function() {
-        throw "FormPanel: updateModel has been deprecated. Please use updateRecord.";
+    //<deprecated since="0.99">
+    updateModel: function() {
+        console.warn("FormPanel: updateModel has been deprecated. Please use updateRecord.");
+        this.updateRecord.apply(this, arguments);
     },
-    //</debug>
+    //</deprecated>
 
     /**
      * Sets the values of form fields in bulk. Example usage:
@@ -352,24 +358,66 @@ myForm.setValues({
     username: 'edspencer'
 });
 </code></pre>
+    If there groups of checkbox fields with the same name, pass their values in an array. For example:
+
+<pre><code>
+myForm.setValues({
+    name: 'Jacky',
+    crazy: false,
+    hobbies: [
+        'reading',
+        'cooking',
+        'gaming'
+    ]
+});
+</code></pre>
+
      * @param {Object} values field name => value mapping object
      * @return {Ext.form.FormPanel} this
      */
     setValues: function(values) {
          var fields = this.getFields(),
-            name, field;
+             name,
+             field;
+             
         values = values || {};
+        
         for (name in values) {
-            if (values.hasOwnProperty(name) && name in fields) {
-                field = fields[name];
-                field.setValue && field.setValue(values[name]);
+            if (values.hasOwnProperty(name)) {
+                if (Ext.isArray(fields[name])) {
+                    fields[name].forEach(function(field) {
+                        if (Ext.isArray(values[name])) {
+                            field.setChecked((values[name].indexOf(field.getValue()) != -1));
+                        } else {
+                            field.setChecked((values[name] == field.getValue()));
+                        }
+                    });
+                } else {
+                    field = fields[name];
+
+                    field.setValue(values[name]);
+                }
             }       
         }
+        
         return this;
     },
 
     /**
-     * Returns an object containing the value of each field in the form, keyed to the field's name
+     * Returns an object containing the value of each field in the form, keyed to the field's name. 
+     * For groups of checkbox fields with the same name, it will be arrays of values. For examples:
+
+<pre><code>
+     {
+         name: "Jacky Nguyen", // From a TextField
+         favorites: [
+            'pizza',
+            'noodle',
+            'cake'
+         ]
+     }
+</code></pre>
+
      * @param {Boolean} enabled <tt>true</tt> to return only enabled fields
      * @return {Object} Object mapping field name to its value
      */
@@ -381,44 +429,77 @@ myForm.setValues({
 
         for (name in fields) {
             if (fields.hasOwnProperty(name)) {
-                field = fields[name];
-                if (enabled && field.disabled) {
-                    continue;
-                }
-                if (field.getValue) {
-                    values[name] = field.getGroupValue ? field.getGroupValue() : field.getValue();
+                if (Ext.isArray(fields[name])) {
+                    values[name] = [];
+
+                    fields[name].forEach(function(field) {
+                        if (field.isChecked() && !(enabled && field.disabled)) {
+                            if (field instanceof Ext.form.Radio) {
+                                values[name] = field.getValue();
+                            } else {
+                                values[name].push(field.getValue());
+                            }
+                        }
+                    });
+                } else {
+                    field = fields[name];
+                    
+                    if (!(enabled && field.disabled)) {
+                        if (field instanceof Ext.form.Checkbox) {
+                            values[name] = (field.isChecked()) ? field.getValue() : null;
+                        } else {
+                            values[name] = field.getValue();
+                        }
+                    }
                 }
             }
         }
 
         return values;
-
     },
 
     /**
      * Resets all fields in the form back to their original values
+     * @return {Ext.form.FormPanel} this This form
      */
     reset: function() {
-        var fields = this.getFields(),
-            name;
-        for (name in fields) {
-            if(fields.hasOwnProperty(name)){
-                fields[name].reset();
-            }
-        }
+        this.getFieldsAsArray().forEach(function(field) {
+            field.reset();
+        });
+
+        return this;
     },
 
     /**
-     * @private
-     * Returns all {@link Ext.Field field} instances inside this form
-     * @return {Object} All field instances, mapped by field name
+     * A convenient method to enable all fields in this forms
+     * @return {Ext.form.FormPanel} this This form
      */
-    getFields: function() {
-        var fields = {};
+    enable: function() {
+        this.getFieldsAsArray().forEach(function(field) {
+            field.enable();
+        });
+
+        return this;
+    },
+
+    /**
+     * A convenient method to disable all fields in this forms
+     * @return {Ext.form.FormPanel} this This form
+     */
+    disable: function() {
+        this.getFieldsAsArray().forEach(function(field) {
+            field.disable();
+        });
+
+        return this;
+    },
+
+    getFieldsAsArray: function() {
+        var fields = [];
 
         var getFieldsFrom = function(item) {
             if (item.isField) {
-                fields[item.getName()] = item;
+                fields.push(item);
             }
 
             if (item.isContainer) {
@@ -427,7 +508,46 @@ myForm.setValues({
         };
 
         this.items.each(getFieldsFrom);
+
         return fields;
+    },
+
+    /**
+     * @private
+     * Returns all {@link Ext.Field field} instances inside this form
+     * @param byName return only fields that match the given name, otherwise return all fields.
+     * @return {Object/Array} All field instances, mapped by field name; or an array if byName is passed
+     */
+    getFields: function(byName) {
+        var fields = {},
+            itemName;
+
+        var getFieldsFrom = function(item) {
+            if (item.isField) {
+                itemName = item.getName();
+
+                if ((byName && itemName == byName) || typeof byName == 'undefined') {
+                    if (fields.hasOwnProperty(itemName)) {
+                        if (!Ext.isArray(fields[itemName])) {
+                            fields[itemName] = [fields[itemName]];
+                        }
+
+                        fields[itemName].push(item);
+                    } else {
+                        fields[itemName] = item;
+                    }
+                }
+
+            }
+
+            if (item.isContainer) {
+                item.items.each(getFieldsFrom);
+            }
+        };
+
+        this.items.each(getFieldsFrom);
+        
+        return (byName) ? (fields[byName] || []) : fields;
     },
 
     getFieldsFromItem: function() {
@@ -480,4 +600,7 @@ myForm.setValues({
  */
 Ext.form.FormPanel.prototype.load = Ext.form.FormPanel.prototype.loadModel; 
 
+Ext.reg('formpanel', Ext.form.FormPanel);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('form', Ext.form.FormPanel);

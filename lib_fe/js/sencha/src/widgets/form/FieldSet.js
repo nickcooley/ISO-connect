@@ -48,6 +48,7 @@ Ext.form.FieldSet = Ext.extend(Ext.Panel, {
     // @private
     afterLayout : function(layout) {
         Ext.form.FieldSet.superclass.afterLayout.call(this, layout);
+        
         if (this.title && !this.titleEl) {
             this.setTitle(this.title);
         } else if (this.titleEl) {

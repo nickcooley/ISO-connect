@@ -32,7 +32,7 @@ slider.getValue(); //returns 8
 Ext.form.Slider = Ext.extend(Ext.form.Field, {
     ui: 'slider',
     /**
-     * @cfg {Boolean} showClear @hide
+     * @cfg {Boolean} useClearIcon @hide
      */
 
     /**
@@ -70,6 +70,8 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
     trackWidth: null,
 
     monitorOrientation: true,
+
+    tabIndex: -1,
      
     renderTpl: [
         '<tpl if="label">',
@@ -110,8 +112,8 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
              * Fires before the value of a thumb is changed. Return false to cancel the change
              * @param {Ext.form.Slider} slider The slider instance
              * @param {Ext.form.Slider.Thumb} thumb The thumb instance
-             * @param {Number} oldValue The previous value
              * @param {Number} newValue The value that the thumb will be set to
+             * @param {Number} oldValue The previous value
              */
             'beforechange',
 
@@ -120,8 +122,8 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
              * Fires when the value of a thumb is changed.
              * @param {Ext.form.Slider} slider The slider instance
              * @param {Ext.form.Slider.Thumb} thumb The thumb instance
-             * @param {Number} oldValue The previous value
              * @param {Number} newValue The value that the thumb will be set to
+             * @param {Number} oldValue The previous value
              */
             'change',
             /**
@@ -209,7 +211,7 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
             oldValue = thumb.getValue(),
             newValue = me.constrain(value);
 
-        if (me.fireEvent('beforechange', me, thumb, oldValue, newValue) !== false) {
+        if (me.fireEvent('beforechange', me, thumb, newValue, oldValue) !== false) {
             if (moveThumb) {
                 me.moveThumb(thumb, me.getPixelValue(newValue, thumb), animate);
             }
@@ -217,7 +219,7 @@ Ext.form.Slider = Ext.extend(Ext.form.Field, {
             thumb.setValue(newValue);
             me.doComponentLayout();
 
-            me.fireEvent('change', me, thumb, oldValue, newValue);
+            me.fireEvent('change', me, thumb, newValue, oldValue);
         }
     },
 
@@ -471,4 +473,7 @@ Ext.form.Slider.Thumb = Ext.extend(Ext.form.Field, {
     }
 });
 
+Ext.reg('sliderthumb', Ext.form.Slider.Thumb);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('thumb', Ext.form.Slider.Thumb);

@@ -44,7 +44,7 @@
         
         //<debug>
         addClass : function() {
-            throw "Component: addClass has been deprecated. Please use addCls.";
+            throw new Error("Component: addClass has been deprecated. Please use addCls.");
         },
         //</debug>
 
@@ -82,7 +82,7 @@
         
         //<debug>
         removeClass : function() {
-            throw "Component: removeClass has been deprecated. Please use removeCls.";
+            throw new Error("Component: removeClass has been deprecated. Please use removeCls.");
         },
         //</debug>
 
@@ -187,7 +187,7 @@
         
         //<debug>
         radioClass : function() {
-            throw "Component: radioClass has been deprecated. Please use radioCls.";
+            throw new Error("Component: radioClass has been deprecated. Please use radioCls.");
         },
         //</debug>
 
@@ -202,7 +202,7 @@
         
         //<debug>
         toggleClass : function() {
-            throw "Component: toggleClass has been deprecated. Please use toggleCls.";
+            throw new Error("Component: toggleClass has been deprecated. Please use toggleCls.");
         },
         //</debug>
 
@@ -217,7 +217,7 @@
         
         //<debug>
         hasClass : function() {
-            throw "Element: hasClass has been deprecated. Please use hasCls.";
+            throw new Error("Element: hasClass has been deprecated. Please use hasCls.");
             return this.hasCls.apply(this, arguments);
         },
         //</debug>
@@ -234,7 +234,7 @@
         
         //<debug>
         replaceClass : function() {
-            throw "Component: replaceClass has been deprecated. Please use replaceCls.";
+            throw new Error("Component: replaceClass has been deprecated. Please use replaceCls.");
         },
         //</debug>
 

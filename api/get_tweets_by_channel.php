@@ -30,14 +30,14 @@ $tweets = array();
 $chanzero = ($_GET['cid'] == 0) ? 'OR screen_name IN (SELECT screen_name FROM attendee) ' : '';
 
 if (isset($_GET['maxid']) && is_numeric($_GET['maxid'])) {
-	$stmt = $mysqli->prepare('SELECT id, screen_name, profile_image_url, created_at, source, text, channel_id 
+	$stmt = $mysqli->prepare('SELECT DISTINCT id, screen_name, profile_image_url, created_at, source, text 
 		FROM status_latest 
 		WHERE (channel_id = ? ' . $chanzero . ') AND id < ?
 		ORDER BY id DESC LIMIT ?');
 	$stmt->bind_param('idi', $_GET['cid'], $_GET['maxid'], $limit);
 }
 else {
-	$stmt = $mysqli->prepare('SELECT id, screen_name, profile_image_url, created_at, source, text, channel_id
+	$stmt = $mysqli->prepare('SELECT DISTINCT id, screen_name, profile_image_url, created_at, source, text
 		FROM status_latest 
 		WHERE channel_id = ? ' . $chanzero . '
 		ORDER BY id DESC LIMIT ?');
@@ -45,7 +45,7 @@ else {
 }
 
 $stmt->execute();
-$stmt->bind_result($id, $screen_name, $profile_image_url, $created_at, $source, $text, $channel_id);
+$stmt->bind_result($id, $screen_name, $profile_image_url, $created_at, $source, $text);
 $next_page_maxid = NULL;
 
 while ($stmt->fetch()) {

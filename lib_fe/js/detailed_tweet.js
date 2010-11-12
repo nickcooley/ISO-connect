@@ -66,10 +66,9 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
 	 var ds = this.storeTweet;
 	 r = ds.getAt(0);
 	 
-	 console.log(r.get('id'));
+	 
 	},
 	updateTwDetail: function(tid){
-		//console.log('tid is ' + tid);
 		
 		Ext.util.JSONP.request({     
       url: 'http://isotwitagg.transitid-dev.com/api/get_tweet.php', //'lib/js/sampleauthors.js',
@@ -80,11 +79,11 @@ isobar.detailedTweet = Ext.extend(Ext.Panel, {
        scope: this,
        callbackKey: 'callback',
        callback: function(result){
-          console.log(result.tweets);
+    
           var tweet = result.tweets[0];
           if(tweet){
             this.storeTweet.loadData(result.tweets);
-          	console.log(tweet);
+    
           	
           	 this.pnlTweet.update(tweet);
              this.pnlTwAuthorDe.update(tweet);

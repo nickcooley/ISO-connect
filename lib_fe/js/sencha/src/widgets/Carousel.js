@@ -4,22 +4,77 @@
  *
  * <p>A customized Panel which provides the ability to slide back and forth between
  * different child items.</p>
- *
- * <pre><code>
+ * 
+ * <h2>Useful Properties</h2>
+ * <ul class="list">
+ *   <li>{@link #ui} (defines the style of the carousel)</li>
+ *   <li>{@link #direction} (defines the direction of the carousel)</li>
+ *   <li>{@link #indicator} (defines if the indicator show be shown)</li>
+ * </ul>
+ * 
+ * <h2>Useful Methods</h2>
+ * <ul class="list">
+ *   <li>{@link #next} (moves to the next card)</li>
+ *   <li>{@link #prev} (moves to the previous card)</li>
+ *   <li>{@link #setActiveItem} (moves to the passed card)</li>
+ * </ul>
+ * 
+ * <h2>Screenshot:</h2>
+ * <p><img src="doc_resources/Ext.Carousel/screenshot.png" /></p>
+ * 
+ * <h2>Example code:</h2>
+<pre><code>
 var carousel = new Ext.Carousel({
-   items: [{
-       html: '&lt;h1&gt;Carousel&lt;/h1&gt;',
-       cls: 'card1'
-   }, {
-       title: 'Tab 2',
-       html: '2',
-       cls: 'card2'
-   }, {
-       title: 'Tab 3',
-       html: '3',
-       cls: 'card3'
-   }]
-});</code></pre>
+    items: [
+        {
+            html: '&lt;p&gt;Navigate the carousel on this page by swiping left/right.&lt;/p&gt;',
+            cls : 'card card1'
+        },
+        {
+            html: '&lt;p&gt;Clicking on either side of the indicators below&lt;/p&gt;',
+            cls : 'card card2'
+        },
+        {
+            html: 'Card #3',
+            cls : 'card card3'
+        }
+    ]
+});
+
+var panel = new Ext.Panel({
+    cls: 'cards',
+    layout: {
+        type : 'vbox',
+        align: 'stretch'
+    },
+    defaults: {
+        flex: 1
+    },
+    items: [
+        carousel,
+        {
+            xtype    : 'carousel',
+            ui       : 'light',
+            direction: 'vertical',
+            
+            items: [
+            {
+                    html: '&lt;p&gt;Carousels can be vertical and given a ui of "light" or "dark".&lt;/p&gt;',
+                    cls : 'card card1'
+                },
+                {
+                    html: 'Card #2',
+                    cls : 'card card2'
+                },
+                {
+                    html: 'Card #3',
+                    cls : 'card card3'
+                }
+            ]
+        }
+    ]
+});
+</code></pre>
  * @xtype carousel
  */
 Ext.Carousel = Ext.extend(Ext.Panel, {
@@ -95,6 +150,7 @@ Ext.Carousel = Ext.extend(Ext.Panel, {
         this.mon(this.body, {
             dragstart: this.onDragStart,
             drag: this.onDrag,
+            dragThreshold: 6,
             dragend: this.onDragEnd,
             direction: this.direction,
             disableLocking: true,

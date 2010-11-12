@@ -66,7 +66,7 @@ Ext.DomObserver = Ext.extend(Object, {
         }
 
         // Add the listeners to the Element immediately following the render call
-        c.render = c.render.{@link Ext.util.createSequence}(function() {
+        c.render = c.render.{@link Ext.util.Functions.createSequence}(function() {
             var e = c.getEl();
             if (e) {
                 e.on(l);
@@ -81,7 +81,7 @@ Ext.DomObserver = Ext.extend(Object, {
     }
 });
 
-var text = new Ext.form.TextField({
+var text = new Ext.form.Text({
 
     // Collapse combo when its element is clicked on
     plugins: [ new Ext.DomObserver({

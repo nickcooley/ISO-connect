@@ -5,16 +5,17 @@ isobar.Master = Ext.extend(Ext.Panel, {
     fullscreen: true,
     listeners: {
       beforecardswitch: function(el, newCard, oldCard, idx){
-        console.log(this);
+       
         if(el.channelList == oldCard ){
-          //this.backButton.show();
-          //console.log(idx);
           el.backButton.show();
           el.refreshBut.show();
+          el.infoBut.hide();
+          
         }
         else if(el.channelList == newCard){
           el.backButton.hide();
           el.refreshBut.hide();
+          el.infoBut.show();
         }
         
       },
@@ -22,11 +23,7 @@ isobar.Master = Ext.extend(Ext.Panel, {
     },
 
     initComponent: function () {
-        //this.enableBubble('refresh');
-    /*
-    this.tBar= new isobar.TopToolBar();
-    this.tBar.on('refresh', this.refresh, this)
-    */
+        
         this.backButton = new Ext.Button({
             ui: 'back',
             text: 'Back',
@@ -41,7 +38,6 @@ isobar.Master = Ext.extend(Ext.Panel, {
             iconCls: 'refresh',
             hidden: true,
             handler: function () {
-                //obj.fireEvent('refresh', this);
                 this.getActiveItem().updateChannel();
             },scope: this
         });
@@ -61,7 +57,47 @@ isobar.Master = Ext.extend(Ext.Panel, {
               ui: 'plain',
               iconCls: 'settings',
               handler: function(){
+                  var attendee = (localStorage.getItem('isoAddedToAttendees'))?true:false;
                   if(!this.settingsPopup){
+                    this.addtoList = new Ext.Panel({
+                      margin: '30px 0 5px',
+                      hidden: attendee,
+                      items: [{
+                        xtype: 'component',
+                        html: 'Would you like to be identified as a conference attendee?',
+                        margin: '0 0 10px'
+                      },{
+                        xtype: 'button',
+                        text: 'add me to SenchaCon',
+                        handler: function(){
+                          var addUser = Ext.Msg.prompt('Are you at SenchaCon?', "Would you like to be identified as a conference attendee?  This way, others at the conference can find you on twitter for some good old fashioned networking!", function(button, answer){
+                
+                          if(button=="ok" && answer.length > 0){
+                            Ext.Ajax.request({
+                              url: '/api/add_attendee.php?screen_name=' + answer,
+                              success: function(response, opts){
+                                var rjson = Ext.decode(response.responseText),
+                                success = rjson.success
+                                if(success == true){
+                                  Ext.Msg.alert('Success', 'Congratulations! You are now added to our list of conference attendees.  Enjoy networking with your colleagues!');
+                                  localStorage.setItem('isoAddedToAttendees',true);
+                                  this.attendeeButton.hide();
+                                }
+                                else{
+                                  Ext.Msg.alert('Error', 'We\'re sorry.  There was a problem with your submission.  Please try again.');
+                                }
+                              }
+                            })  
+                          }
+                          else{
+                            return false;
+                          }
+                        }, null, false, null, {placeholder: ' twitter screen name '});
+                          
+                        }
+                      }]
+                    })
+                    
                     this.settingsPopup = new Ext.Panel({
                       floating: true,
                       modal: true, 
@@ -72,7 +108,8 @@ isobar.Master = Ext.extend(Ext.Panel, {
                       items: [
                         {
                           xtype: 'panel', 
-                          html: "<p>Looks like you're logged into Twitter.  Click below to log out... </p>"    
+                          html: "<p>Looks like you're logged into Twitter.  Click below to log out... </p>",    
+                          margin: '0 0 10px'
                         },
                         {
                           xtype: 'button',
@@ -80,11 +117,9 @@ isobar.Master = Ext.extend(Ext.Panel, {
                           handler: function(){
                             window.open('/twitoauth/clearsessions.php', "_self");
                           }
-                        }
+                        },
+                        this.addtoList
                       ],
-                      
-                      
-                      //html: ""
                       dockedItems: [{
                           dock: 'top',
                           xtype: 'toolbar',
@@ -178,7 +213,7 @@ isobar.Master = Ext.extend(Ext.Panel, {
             this.infoBut
             ]
         }
-        if(localStorage.getItem('oAuth') && !Ext.is.Phone){
+        if(localStorage.getItem('oAuth')){
           btns.push(this.settingsBut);
         }
         this.tBar = new Ext.Toolbar({
@@ -194,10 +229,10 @@ isobar.Master = Ext.extend(Ext.Panel, {
 
         if (!Ext.is.Phone) {
             this.channelList.setWidth(300);
-            this.channelList.setHeight(460);
+            //this.channelList.setHeight(395);
             this.channelList.setScrollable(false);
             this.channelList.setFloating(true);
-            this.channelList.doLayout();
+            this.channelList.doComponentLayout();
         }
 
         /* Need to accommodate for allowing the Forrester feed to have unfettered access */
@@ -232,7 +267,7 @@ isobar.Master = Ext.extend(Ext.Panel, {
           width: (Ext.is.Phone)?275:450,
           height: (Ext.is.Phone)?350:400, 
           styleHtmlContent: true,
-          html:  "<p>ISO|connect helps conference attendees easily connect and interact with experts and like-minded colleagues to maximize their  conference experience.  With ISO|connect, you can:</p><ul><li>Follow and pinpoint trends relevant to your industry</li><li>Connect with top thinkers around those specific trends</li><li>Share your learnings and key conference takeaways through Twitter</li></ul><p>To get started, just tap away from this window.</p>",
+          html:  "<p>ISO|connect helps SenchaCon attendees easily connect and interact with experts and like-minded colleagues to maximize their  conference experience.  With ISO|connect, you can:</p><ul><li>Follow and pinpoint trends relevant to your industry</li><li>Connect with top thinkers around those specific trends</li><li>Share your learnings and key conference takeaways through Twitter</li></ul><p>To get started, just tap away from this window.</p>",
           dockedItems: [{
               dock: 'top',
               xtype: 'toolbar',
@@ -247,7 +282,6 @@ isobar.Master = Ext.extend(Ext.Panel, {
       
     },
     onNavButtonTap: function () {
-        console.log(this.channelList);
         this.channelList.showBy(this.navigationBut, 'fade');
     },
     setBack: function () {
@@ -259,31 +293,31 @@ isobar.Master = Ext.extend(Ext.Panel, {
             }
             //currIdx = aI.items.indexOf(saI);
             if (aI == this.channelList) {
-                console.log('at home');
+                
             }
             else if (aI.isXType("tabpanel")) {
                 var ssaI = saI.getActiveItem(),
                     currIdx = saI.items.indexOf(ssaI);
                 newIdx = currIdx - 1;
-                console.log(newIdx);
+                
 
-                saI.setCard((newIdx >= 0) ? newIdx : 0, backAnim);
+                saI.setActiveItem((newIdx >= 0) ? newIdx : 0, backAnim);
                 if (newIdx == -1) {
-                    this.setCard(0, backAnim);
+                    this.setActiveItem(0, backAnim);
                 }
 
             }
             else {
-                this.setCard(0, backAnim);
+                this.setActiveItem(0, backAnim);
             }
 
-            //currIdx = aI.items.indexOf()
+            
 
 
     },
     refresh: function () {
         this.getActiveItem().fireEvent('refresher');
-        //console.log(this.getActiveItem().refresher);
+        
     },
     channelSelect: function (cid) {
         if(!Ext.is.Phone){
@@ -303,13 +337,11 @@ isobar.Master = Ext.extend(Ext.Panel, {
         if (Ext.is.Phone) {
             this.tBar.setTitle(shortN);
             this.authorPanel.on('updateComplete', function () {
-                this.setCard(1, 'slide')
+                this.setActiveItem(1, 'slide')
             }, this);
         }
-        else {
-                        
-              this.authorPanel.tTweetsBar.setTitle(name);
-                        
+        else {                        
+              this.authorPanel.tTweetsBar.setTitle(name);                        
         }
     }
 
@@ -318,21 +350,27 @@ isobar.Master = Ext.extend(Ext.Panel, {
 
 iso.Util = {
   openUrl: function(url) {                
-      console.log(url)
-      Ext.Msg.confirm('Log into Twitter', "This link will open in an external browser window. Would you like to continue?", 
-          function() {
-             window.open(url, '_self');              
-          }
+      
+      Ext.Msg.confirm('Leaving Site', "This link will open in an external browser window. Would you like to continue?", 
+          function(button) {
+             if(button == "yes"){
+              
+              window.open(url, "_self");                                         
+             
+             }              
+          },this
       );      
   },
   beginOAuth: function() {
-        Ext.Msg.confirm('Log into Twitter', "In order to utilize this feature of the site, we'll need you to log into Twitter. ", 
-          function() {
-                window.open('/twitoauth/redirect.php', "_self");
-              
+        Ext.Msg.confirm('Log into Twitter', "In order to utilize this feature of the application, please authenticate with Twitter. Clicking 'Yes' will take you there and bring you back once you have completed the process.", 
+          function(button) {
+                
+                if(button == "yes"){
+                  window.open('/twitoauth/redirect.php', "_self");
+                }
           }
       ); 
-    }
+  }
 }
 
 var toString = Object.prototype.toString,
@@ -379,29 +417,13 @@ Ext.setup({
       isobar.masterPanel = new isobar.Master();
      
         
-        
-  /*  
-   *     localStorage.removeItem('isoConnectUnlocked');
-  localStorage.removeItem('isoDisplayModel');
-  localStorage.removeItem('oAuth'); 
- localStorage.removeItem('isoConnectUnlocked');
-  localStorage.removeItem('isoDisplayModel');
-  localStorage.removeItem('oAuth');      
- localStorage.setItem('isoConnectUnlocked', 'true');
- 
- 
-  localStorage.removeItem('isoConnectUnlocked');
-   */
 
     }
 });
 
 } 
   else{
-      var d = document.createElement("div");
-      d.className = "noWebkitBrowser"
-      d.innerHTML = "<img src='/img/placeholder.jpg'/><p>We're sorry, ISO|connect is not available for your browser</p>"
-      document.body.appendChild(d);
+      document.location = "unsupportedBrowser.html"
       _gaq.push(['_trackPageview', "/root/wrongbrowser"]);
     }  
 

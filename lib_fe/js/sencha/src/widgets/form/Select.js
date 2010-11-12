@@ -11,13 +11,12 @@ new Ext.form.Select({
     ]
 });
 </code></pre>
- * @xtype select
+ * @xtype selectfield
  */
-Ext.form.Select = Ext.extend(Ext.form.TextField, {
-
+Ext.form.Select = Ext.extend(Ext.form.Text, {
     ui: 'select',
     /**
-     * @cfg {Boolean} showClear @hide
+     * @cfg {Boolean} useClearIcon @hide
      */
 
     /**
@@ -38,43 +37,39 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
      */
 
     /**
-     * @cfg {Array} options (Optional) An inline array of selection option objects containing corresponding
-     * {@link #valueField valueField} and {@link #displayField displayField} suitable for rendering the options list.
+     * @cfg {Array} options (Optional) An array of select options.
+<pre><code>
+    [
+        {text: 'First Option',  value: 'first'},
+        {text: 'Second Option', value: 'second'},
+        {text: 'Third Option',  value: 'third'}
+    ]
+</code></pre>
+     * Note: option object member names should correspond with defined {@link #valueField valueField} and {@link #displayField displayField} values.
+     * This config will be ignore if a {@link #store store} instance is provided
      */
     
-    maskField: true,
-
-    /**
-     * @cfg {String} prependText A static string to prepend before the active item's text when displayed as the
-     * select's text. Defaults to ''.
-     */
-    prependText: '',
-    
-    /**
-     * @cfg {String} hiddenName Specify a hiddenName if you're using the {@link Ext.form.FormPanel#standardSubmit standardSubmit} option.
-     * This name will be used to post the underlying value of the select to the server.
-     */
-    hiddenName: '',
-
-    // @private
+    // @cfg {Number} tabIndex @hide
     tabIndex: -1,
 
+    // @cfg {Boolean} useMask @hide
+    useMask: true,
+    
     // @private
     initComponent: function() {
-        // backwards compatibility - deprecate in next major release
-        this.label = this.label || this.fieldLabel;
+        var options = this.options;
 
-        var options    = this.options,
-            ln         = options && options.length;
-
-        if (options && Ext.isArray(options) && ln) {
-            this.store = new Ext.data.Store({
-                model: 'x-textvalue',
-                data: options
-            });
-        }
-        else if (this.store) {
+        if (this.store) {
             this.store = Ext.StoreMgr.lookup(this.store);
+        }
+        else {
+            this.store = new Ext.data.Store({
+                fields: [this.valueField, this.displayField]
+            });
+
+            if (options && Ext.isArray(options) && options.length > 0) {
+                this.setOptions(this.options);
+            }
         }
 
         Ext.form.Select.superclass.initComponent.call(this);
@@ -88,20 +83,6 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
              */
             'change'
         );
-    },
-    
-    onRender: function() {
-        var name = this.hiddenName;
-            
-        Ext.form.Select.superclass.onRender.apply(this, arguments);
-        
-        if (name) {
-            this.hiddenField = this.el.insertSibling({
-                name: name,
-                tag: 'input',
-                type: 'hidden'
-            }, 'after', true);
-        }
     },
 
     getPicker: function() {
@@ -132,10 +113,12 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
                 stopMaskTapEvent : true,
                 hideOnMaskTap    : true,
                 cls              : 'x-select-overlay',
+                scroll           : 'vertical',
                 items: {
                     xtype: 'list',
                     store: this.store,
                     itemId: 'list',
+                    scroll: false,
                     itemTpl : [
                         '<span class="x-list-label">{' + this.displayField + '}</span>',
                         '<span class="x-list-selected"></span>'
@@ -194,31 +177,31 @@ Ext.form.Select = Ext.extend(Ext.form.TextField, {
             this.fireEvent('change', this, newValue);
         }
     },
-    
-    getValue: function() {
-        return this.value;
-    },
 
-    initValue: function() {
-        this.setValue(this.value);
-        this.originalValue = this.getValue();
-    },
-
-    setValue: function(v) {
-        var record = v ? this.store.findRecord(this.valueField, v): this.store.getAt(0),
-            hidden = this.hiddenField;
+    // Inherited docs
+    setValue: function(value) {
+        var record = value ? this.store.findRecord(this.valueField, value) : this.store.getAt(0);
 
         if (record && this.rendered) {
-            this.fieldEl.dom.value = this.prependText + ' ' + record.get(this.displayField);
+            this.fieldEl.dom.value = record.get(this.displayField);
             this.value = record.get(this.valueField);
         } else {
-            this.value = v;
+            this.value = value;
+        }
+
+        // Temporary fix, the picker should sync with the store automatically by itself
+        if (this.picker) {
+            var pickerValue = {};
+            pickerValue[this.name] = this.value;
+            this.picker.setValue(pickerValue);
         }
         
-        if (hidden) {
-            hidden.value = this.value;
-        }
         return this;
+    },
+
+    // Inherited docs
+    getValue: function(){
+        return this.value;
     },
 
     /**
@@ -259,4 +242,7 @@ selectBox.setOptions(
     }
 });
 
+Ext.reg('selectfield', Ext.form.Select);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('select', Ext.form.Select);

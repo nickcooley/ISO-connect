@@ -29,23 +29,17 @@ tabpanel         {@link Ext.TabPanel}
 
 Form components
 ---------------------------------------
-form             {@link Ext.form.FormPanel}
-checkbox         {@link Ext.form.Checkbox}
-select           {@link Ext.form.Select}
+formpanel        {@link Ext.form.FormPanel}
+checkboxfield    {@link Ext.form.Checkbox}
+selectfield      {@link Ext.form.Select}
 field            {@link Ext.form.Field}
 fieldset         {@link Ext.form.FieldSet}
-hidden           {@link Ext.form.Hidden}
-numberfield      {@link Ext.form.NumberField}
-radio            {@link Ext.form.Radio}
-textarea         {@link Ext.form.TextArea}
-textfield        {@link Ext.form.TextField}
-
-Store xtypes
----------------------------------------
-store            {@link Ext.data.Store}
-arraystore       {@link Ext.data.ArrayStore}
-jsonstore        {@link Ext.data.JsonStore}
-xmlstore         {@link Ext.data.XmlStore}
+hiddenfield      {@link Ext.form.Hidden}
+numberfield      {@link Ext.form.Number}
+radiofield       {@link Ext.form.Radio}
+textareafield    {@link Ext.form.TextArea}
+textfield        {@link Ext.form.Text}
+togglefield      {@link Ext.form.Toggle}
 </pre>
  * @constructor
  * @param {Ext.Element/String/Object} config The configuration options may be specified as either:
@@ -162,7 +156,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         Ext.Component.superclass.onRender.apply(this, arguments);
 
         if (this.monitorOrientation) {
-            this.el.addCls('x-' + Ext.orientation);
+            this.el.addCls('x-' + Ext.Viewport.orientation);
         }
 
         if (this.floating) {
@@ -180,7 +174,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
 
     afterRender : function() {
         if (this.fullscreen) {
-            this.layoutOrientation(Ext.orientation, this.width, this.height);
+            this.layoutOrientation(Ext.Viewport.orientation, this.width, this.height);
         }
         Ext.Component.superclass.afterRender.call(this);
     },
@@ -551,7 +545,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         }
 
         Ext.destroy(this.scroller);
-        this.scroler = null;
+        this.scroller = null;
         
         if (config !== false) {
             var direction = Ext.isObject(config) ? config.direction: config;
@@ -665,6 +659,7 @@ Ext.Component = Ext.extend(Ext.lib.Component, {
         if (this.floating && this.modal && !this.hidden) {
             this.el.parent().unmask();
         }
+        Ext.destroy(this.scroller);
         Ext.Component.superclass.beforeDestroy.call(this);
     },
     

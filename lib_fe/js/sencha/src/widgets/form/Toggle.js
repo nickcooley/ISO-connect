@@ -3,7 +3,7 @@
  * @extends Ext.form.Slider
  * <p>Specialized Slider with a single thumb and only two values. By default the toggle component can
  * be switched between the values of 0 and 1.</p>
- * @xtype toggle
+ * @xtype togglefield
  */
 Ext.form.Toggle = Ext.extend(Ext.form.Slider, {
     minValue: 0,
@@ -12,7 +12,7 @@ Ext.form.Toggle = Ext.extend(Ext.form.Slider, {
     inputType: 'toggle',
 
     /**
-     * @cfg {Boolean} showClear @hide
+     * @cfg {Boolean} useClearIcon @hide
      */
 
     /**
@@ -69,8 +69,19 @@ Ext.form.Toggle = Ext.extend(Ext.form.Slider, {
     }
 });
 
+Ext.reg('togglefield', Ext.form.Toggle);
+
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('toggle', Ext.form.Toggle);
 
+
+/**
+ * @class Ext.form.Toggle.Thumb
+ * @extends Ext.form.Slider.Thumb
+ * @private
+ * @ignore
+ */
 Ext.form.Toggle.Thumb = Ext.extend(Ext.form.Slider.Thumb, {
     onRender: function() {
         Ext.form.Toggle.Thumb.superclass.onRender.apply(this, arguments);

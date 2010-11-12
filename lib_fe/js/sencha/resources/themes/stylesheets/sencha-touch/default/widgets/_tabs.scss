@@ -133,12 +133,11 @@ $tabs-top-height: $global-row-height - .8em;
     }
     
     .x-tab-active {
-      @include color-by-background($bar-color, 50%);
+      @include color-by-background($bar-color, 90%);
     }
     
     .x-tab-pressed {
-      @include color-by-background(lighten($bar-color, 10%), 45%);
-      background-color: rgba(#000, .2);
+      @include color-by-background($bar-color, 100%);
     }
   }
   
@@ -165,12 +164,10 @@ $tabs-top-height: $global-row-height - .8em;
   
   @if $include-top-tabs {
     .x-tabbar-#{$ui-label}.x-docked-top {
+      
       .x-tab-active {
-        @include background-gradient(lighten($bar-color, 10%), 'recessed');
-      }
-
-      .x-tab-active {
-        @include color-by-background(lighten($bar-color, 10%), 90%);
+        @include background-gradient(darken($bar-color, 5%), 'recessed');
+        @include color-by-background(darken($bar-color, 5%));
       }
     }
   }

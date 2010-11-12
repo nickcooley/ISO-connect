@@ -149,7 +149,7 @@ Ext.EventManager = {
             if (!cache.hasOwnProperty(ev)) {
                 continue;
             }
-            this.removeListener(ev);
+            this.removeListener(dom, ev);
         }
         Ext.cache[dom.id].events = {};
     },

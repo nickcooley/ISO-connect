@@ -2,10 +2,11 @@
  * @class Ext.form.TextArea
  * @extends Ext.form.Field
  * <p>Wraps a textarea. See {@link Ext.form.FormPanel FormPanel} for example usage.</p>
- * @xtype textarea
+ * @xtype textareafield
  */
-Ext.form.TextArea = Ext.extend(Ext.form.TextField, {
-    maskField: Ext.is.iOS,
+Ext.form.TextArea = Ext.extend(Ext.form.Text, {
+    ui: 'textarea',
+
     /**
      * @cfg {Integer} maxRows The maximum number of lines made visible by the input. 
      */
@@ -26,17 +27,19 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField, {
             '<tpl if="autoCapitalize">autocapitalize="{autoCapitalize}" </tpl>',
             '<tpl if="autoFocus">autofocus="{autoFocus}" </tpl>',
             '></textarea>',
-            '<tpl if="maskField"><div class="x-field-mask"></div></tpl>',
+            '<tpl if="useMask"><div class="x-field-mask"></div></tpl>',
         '</div></tpl>'
     ],
-    
-    ui: 'textarea',
     
     // @private
     onRender: function() {
         this.renderData.maxRows = this.maxRows;
+        
         Ext.form.TextArea.superclass.onRender.apply(this, arguments);
     }
 });
 
+Ext.reg('textareafield', Ext.form.TextArea);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('textarea', Ext.form.TextArea);

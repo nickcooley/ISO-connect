@@ -9,13 +9,12 @@
 require_once('/var/www/config/main.conf.php');
 require('/var/www/lib/helpers.php');
 
+error_log("STARTING UPDATE VOICES...................");
 for ($cid = 0; $cid < 10; $cid++) {
 $root = '/var/www/';
 $cachefile = $root . '/cache_dave/get_voices_by_channel';
 $cachefile .=  ".chan-{$cid}.cache";
 ob_start();
-
-echo $cid;
 
 $mysqli = new mysqli(DBHOST, DBUSER, DBPASS, DB);
 if (mysqli_connect_error()) {
@@ -30,12 +29,12 @@ $chanzero_op = ($cid == 0) ? 'OR' : 'AND';
 $chanzero = ($cid == 0) ? 'OR screen_name IN (SELECT screen_name FROM attendee) ' : '';
 
 $users = array();
-$stmt = $mysqli->prepare('SELECT screen_name, profile_image_url, count, id FROM voices
+$stmt = $mysqli->prepare('SELECT screen_name, profile_image_url, count FROM voices
 		WHERE channel_id = ? ' . $chanzero . ' 
 		ORDER BY count DESC LIMIT 10'); 
 $stmt->bind_param('i', $cid);
 $stmt->execute();
-$stmt->bind_result($screen_name, $profile_image_url, $qty, $id);
+$stmt->bind_result($screen_name, $profile_image_url, $qty);
 
 //Add the latest top voices
 while ($stmt->fetch()) {
@@ -46,20 +45,18 @@ while ($stmt->fetch()) {
                 'count' => $qty,
                 'screen_name' => $screen_name,
                 'profile_image_url' => $profile_image_url,
-                'id' => $id,
         );
 }
 $stmt->close();
 
-$stmt_insert = $mysqli->prepare('INSERT INTO voices_latest values(?,?,?,?,?) ON DUPLICATE KEY UPDATE count=?');
+$stmt_insert = $mysqli->prepare('INSERT INTO voices_latest values(?,?,?,?) ON DUPLICATE KEY UPDATE count=?');
 foreach ($users as $user) {
 	$stmt_insert->bind_param('ssiii', 
 		$user['screen_name'],
 		$user['profile_image_url'],
 		$cid,
 		$user['count'],
- 		$user['count'],
-		$user['id']);	
+ 		$user['count']);	
 
 	if ($cid == 1) {
 		echo "USER: " . $user['screen_name'] . "  COUNT: " . $user['count'] . "\n";
@@ -82,13 +79,12 @@ if ($num_rows > 10) {
    echo "NUM ROWS: " . $num_rows . "\n";
    echo "NUM OVER: " . $num_over . "\n";
    $stmt_deleteold->bind_param('ii',$cid, $num_over);
-/**
    if(!$stmt_deleteold->execute()) {
      print $mysqli->error . "\n";
    }
-*/
 }
 
 
 }
+error_log("FINISHED UPDATE VOICES...................");
 ?>

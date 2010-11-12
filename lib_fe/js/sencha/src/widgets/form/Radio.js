@@ -6,70 +6,57 @@
  * @constructor
  * Creates a new Radio
  * @param {Object} config Configuration options
- * @xtype radio
+ * @xtype radiofield
  */
 Ext.form.Radio = Ext.extend(Ext.form.Checkbox, {
     inputType: 'radio',
+    
     ui: 'radio',
+    
     /**
-     * @cfg {Boolean} showClear @hide
+     * @cfg {Boolean} useClearIcon @hide
      */
 
     /**
-     * If this radio is part of a group, it will return the selected value
+     * Returns the selected value if this radio is part of a group (other radio fields with the same name, in the same FormPanel),
      * @return {String}
      */
     getGroupValue: function() {
-        var parent = this.el.up('form') || Ext.getBody(),
-            radios = parent.select('input[name=' + this.fieldEl.dom.name + ']', true),
-            checkedRadio;
-            
-        radios.each(function(radio) {
-            if (radio.dom.checked) {
-                checkedRadio = radio;
-                return false;
+        var field,
+            fields = this.getSameGroupFields();
+
+        for (var i=0; i<fields.length; i++) {
+            field = fields[i];
+
+            if (field.isChecked()) {
+                return field.getValue();
             }
-        });
-        
-        return checkedRadio && checkedRadio.dom ? checkedRadio.dom.value: null;
+        }
+
+        return null;
     },
 
     /**
-     * Sets either the checked/unchecked status of this Radio, or, if a string value
-     * is passed, checks a sibling Radio of the same name whose value is the value specified.
-     * @param value {String/Boolean} Checked value, or the value of the sibling radio button to check.
+     * Set the matched radio field's status (that has the same value as the given string) to checked
+     * @param {String} value The value of the radio field to check
+     * @return {String}
      */
-    setValue: function(value) {
-        if (typeof value == 'boolean') {
-            Ext.form.Radio.superclass.setValue.call(this, value);
-        } 
-        else if (this.rendered && value != undefined) {
-            var radio = this.findMatchingRadio(value),
-                wrap = radio ? radio.up('.' + this.renderData.baseCls) : null;
-            if (wrap) {
-                Ext.getCmp(wrap.id).setValue(true);
-            }
-        }
-    },
-    
-    // @private
-    findMatchingRadio: function(value) {
-        var checkEl;
-        this.getCheckEl().select('input[name=' + this.fieldEl.dom.name + ']').each(function(el) {
-            if (el.dom.value == value) {
-                checkEl = el.dom;
-                return false;
-            }
-        });
-        return Ext.get(checkEl);
-    },
+    setGroupValue: function(value) {
+        var field,
+            fields = this.getSameGroupFields();
 
-    // @private
-    getCheckEl: function() {
-        if (this.inGroup) {
-            return this.el.up('.x-form-radio-group');
+        for (var i=0; i<fields.length; i++) {
+            field = fields[i];
+
+            if (field.getValue() == value) {
+                field.check();
+                return;
+            }
         }
-        return this.el.up('form') || Ext.getBody();
     }
 });
+
+Ext.reg('radiofield', Ext.form.Radio);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('radio', Ext.form.Radio);

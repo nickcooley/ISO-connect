@@ -1,58 +1,56 @@
 /**
  * @class Ext.MessageBox
  * @extends Ext.Sheet
- * @xtype msgbox
- *
- * <p>Utility class for generating different styles of message boxes. The framework provides a global singleton {@link #Ext.Msg} for common usage.<p/>
+ * 
+ * <p>Utility class for generating different styles of message boxes. The framework provides a global singleton {@link Ext.Msg} for common usage.<p/>
  * <p>Note that the MessageBox is asynchronous.  Unlike a regular JavaScript <code>alert</code> (which will halt
  * browser execution), showing a MessageBox will not cause the code to stop.  For this reason, if you have code
  * that should only run <em>after</em> some user feedback from the MessageBox, you must use a callback function
  * (see the <code>fn</code> configuration option parameter for the {@link #show show} method for more details).</p>
- * <p>Example usage:</p>
+ * 
+ * <h2>Screenshot</h2>
+ * <p><img src="doc_resources/Ext.MessageBox/screenshot.png" /></p>
+ * 
+ * <h2>Example usage:</h2>
  * <pre><code>
 // Basic alert:
-Ext.Msg.alert('Status', 'Changes saved successfully.');
+Ext.Msg.alert('Title', 'The quick brown fox jumped over the lazy dog.', Ext.emptyFn);
 
 // Prompt for user data and process the result using a callback:
-Ext.Msg.prompt('Name', 'Please enter your name:', function(text){
+Ext.Msg.prompt('Name', 'Please enter your name:', function(text) {
     // process text value and close...
 });
 
-// Show a dialog using config options:
-Ext.Msg.show({
-   title: 'Save Changes?',
-   msg: 'You are closing a tab that has unsaved changes. Would you like to save your changes?',
-   buttons: Ext.MessageBox.YESNOCANCEL,
-   fn: processResult,
-   icon: Ext.MessageBox.QUESTION
-});
-  * </code></pre>
-  */
+// Confirmation alert
+Ext.Msg.confirm("Confirmation", "Are you sure you want to do that?", Ext.emptyFn);
+ * </code></pre>
+ * @xtype messagebox
+ */
 Ext.MessageBox = Ext.extend(Ext.Sheet, {
     // Inherited from Ext.Sheet
-    centered         : true,
+    centered: true,
 
     // Inherited
-    renderHidden     : true,
+    renderHidden: true,
 
     // Inherited
-    ui               : 'dark',
+    ui: 'dark',
 
     /**
      * @cfg {String} componentCls
      * Component's Base CSS class
      */
-    componentCls     : 'x-msgbox',
+    componentCls: 'x-msgbox',
 
     /**
-     * @cfg {String/Mixed} Animation effect when the message box is being displayed (defaults to 'pop')
+     * @cfg {String/Mixed} enterAnimation effect when the message box is being displayed (defaults to 'pop')
      */
-    enterAnimation        : 'pop',
+    enterAnimation: 'pop',
 
     /**
-     * @cfg {String/Mixed} Animation effect when the message box is being hidden (defaults to 'pop')
+     * @cfg {String/Mixed} exitAnimation effect when the message box is being hidden (defaults to 'pop')
      */
-    exitAnimation         : 'pop',
+    exitAnimation: 'pop',
 
 
 // Not sure what good this does, so I just comment it out for now
@@ -359,7 +357,8 @@ Ext.Msg.show({
      * (could also be the top-right close button).
      * @param {String} title The title bar text
      * @param {String} msg The message box body text
-     * @param {Function} fn (optional) The callback function invoked when user taps on the OK button
+     * @param {Function} fn (optional) The callback function invoked when user taps on the OK/Cancel button.
+     * The button is passed as the first argument.
      * @param {Object} scope (optional) The scope (<code>this</code> reference) in which the callback is executed. Defaults to the browser wnidow.
      * @return {Ext.MessageBox} this
      */
@@ -369,8 +368,7 @@ Ext.Msg.show({
             msg : msg,
             buttons: Ext.MessageBox.YESNO,
             fn: function(button) {
-                if (button == 'yes')
-                    fn.apply(scope);
+                fn.call(scope, button);
             },
             scope : scope,
             icon: Ext.MessageBox.QUESTION
@@ -384,8 +382,8 @@ Ext.Msg.show({
      * close button) and the text that was entered will be passed as the two parameters to the callback.
      * @param {String} title The title bar text
      * @param {String} msg The message box body text
-     * @param {Function} fn (optional) The callback function invoked when the user taps on the OK button,
-     * the entered string value is passed as the first argument
+     * @param {Function} fn (optional) The callback function invoked when the user taps on the OK/Cancel button,
+     * the button is passed as the first argument, the entered string value is passed as the second argument
      * @param {Object} scope (optional) The scope (<code>this</code> reference) in which the callback is executed. Defaults to the browser wnidow.
      * @param {Boolean/Number} multiLine (optional) True to create a multiline textbox using the defaultTextHeight
      * property, or the height in pixels to create the textbox (defaults to false / single-line)
@@ -421,8 +419,7 @@ Ext.Msg.show({
             msg : msg,
             buttons: Ext.MessageBox.OKCANCEL,
             fn: function(button, inputValue) {
-                if (button == 'ok')
-                    fn.call(scope, inputValue);
+                fn.call(scope, button, inputValue);
             },
             scope : scope,
             icon  : Ext.MessageBox.QUESTION,
@@ -505,11 +502,16 @@ Ext.MessageBox.ERROR
 
 })();
 
+Ext.reg('messagebox', Ext.MessageBox);
+
+//DEPRECATED - remove this in 1.0. See RC1 Release Notes for details
 Ext.reg('msgbox', Ext.MessageBox);
 
 /**
  * @class Ext.Msg
+ * 
+ * <p>A global shared singleton instance of the {@link Ext.MessageBox} class. See {@link Ext.MessageBox} for documentation.</p>
+ * 
  * @singleton
- * A global shared singleton instance of the {@link #Ext.MessageBox} class.
  */
 Ext.Msg = new Ext.MessageBox();
