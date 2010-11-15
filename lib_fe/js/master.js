@@ -229,7 +229,6 @@ isobar.Master = Ext.extend(Ext.Panel, {
 
         if (!Ext.is.Phone) {
             this.channelList.setWidth(300);
-            //this.channelList.setHeight(395);
             this.channelList.setScrollable(false);
             this.channelList.setFloating(true);
             this.channelList.doComponentLayout();
@@ -239,11 +238,7 @@ isobar.Master = Ext.extend(Ext.Panel, {
         
         
         this.authorPanel = new iso.channel();
-        
-        
         var masterItems = [this.authorPanel]
-        
-        
         
         if (Ext.is.Phone) {
             masterItems.unshift(this.channelList);
@@ -411,13 +406,8 @@ Ext.setup({
     phoneStartupScreen: 'lib_fe/img/iphone_loading_screen.png',
     icon: (Ext.is.Phone) ? 'lib_fe/img/iphone_icon.png' : "lib_fe/img/iPad_icon.png",
     glossOnIcon: false,
-    onReady: function () {
-
-    
-      isobar.masterPanel = new isobar.Master();
-     
-        
-
+    onReady: function () {    
+      isobar.masterPanel = new isobar.Master();             
     }
 });
 
