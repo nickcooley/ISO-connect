@@ -23,8 +23,6 @@ iso.TweetList = Ext.extend(Ext.List, {
     this.store = new Ext.data.JsonStore({model: 'Tweet'});
     this.itemTpl = tweetTpl;
     
-       
-      
       var refreshButton = new Ext.Button({
           iconMask: true,
           iconCls: 'refresh',
@@ -32,7 +30,6 @@ iso.TweetList = Ext.extend(Ext.List, {
           scope: this
         });                    
     
-    //this.dockedItems = [this.toolbar] ;
     iso.TweetList.superclass.initComponent.call(this);
     this.addEvents('updateComplete', 'refresher','updateComplete', 'selectTweet');
     this.on('itemtap', this.tweetSelect, this);

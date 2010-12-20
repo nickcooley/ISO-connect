@@ -6,9 +6,7 @@ Ext.regModel('topVoices', {
 })
   
 Ext.regModel('AuthorList', {
-  fields: ['img', /*'author_full_name', */ 'screen_name', 'from_user_id', 'description', 'total_following', 'followers', 'listed', 'tweet_total', 'attending']
-	//fields: [{name:'img', type: 'string'},{name: 'author_full_name', type: 'string'},{name:'author_at_name', type: 'string'}]
-	
+  fields: ['img', 'screen_name', 'from_user_id', 'description', 'total_following', 'followers', 'listed', 'tweet_total', 'attending']	
 });
 
 
